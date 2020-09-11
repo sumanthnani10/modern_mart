@@ -1,0 +1,284 @@
+import 'package:flutter/material.dart';
+import '../containers/focused_menu.dart';
+import '../screens/category_screen.dart';
+import '../storage.dart';
+
+class CategoriesScreen extends StatefulWidget {
+  @override
+  _CategoriesScreenState createState() => _CategoriesScreenState();
+}
+
+class _CategoriesScreenState extends State<CategoriesScreen>
+    with AutomaticKeepAliveClientMixin {
+  List<dynamic> t;
+  List<String> categories = ['New Arrival'] + Storage.categories;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Storage.APP_COLOR,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
+        child: Storage.cart == null
+            ? Column(
+                children: <Widget>[
+                  LinearProgressIndicator(),
+                ],
+              )
+            : SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: List.generate(categories.length, (i) {
+                    if (categories[i] == categories[0]) {
+                      t = Storage.products.toList();
+                      t.sort((a, b) {
+                        if (b
+                            .data()['o']
+                            .toDate()
+                            .isBefore(a.data()['o'].toDate()))
+                          return -1;
+                        else
+                          return 1;
+                      });
+                    } else {
+                      t = List.from(Storage.products.where((element) {
+                        return element.data()['c'] == i - 1;
+                      }));
+                    }
+                    if (t.length == 0) {
+                      return Container();
+                    } else {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  categories[i],
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                                if (categories[i] != categories[0])
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.of(context).push(createRoute(
+                                          CategoryScreen(categories[i],
+                                              products: List.from(Storage
+                                                  .products
+                                                  .where((element) {
+                                        return element.data()['c'] == i - 1;
+                                      })))));
+                                    },
+                                    child: Text(
+                                      'More',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.indigo,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          SingleChildScrollView(
+                            physics: BouncingScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: List<Widget>.generate(
+                                      t.length < 5 ? t.length : 5, (index) {
+                                    return ProductCard(
+                                      snap: t[index].data(),
+                                      hw: true,
+                                    );
+                                  }).toList() +
+                                  [
+                                    if (categories[i] != categories[0])
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.of(context).push(
+                                              createRoute(CategoryScreen(
+                                                  categories[i], products:
+                                                      List.from(Storage.products
+                                                          .where((element) {
+                                            return element.data()['c'] == i - 1;
+                                          })))));
+                                        },
+                                        child: Container(
+                                          width: 160,
+                                          height: 236,
+                                          child: Card(
+                                            elevation: 4,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: <Widget>[
+                                                Text(
+                                                  'More',
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      color: Colors.indigo),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                  ],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 4,
+                          )
+                        ],
+                      );
+                    }
+                  }).toList(),
+                ),
+              ),
+      ),
+    );
+  }
+
+  Route createRoute(dest) {
+    return PageRouteBuilder(
+      transitionDuration: Duration(milliseconds: 500),
+      pageBuilder: (context, animation, secondaryAnimation) => dest,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = Offset(0, 1);
+        var end = Offset.zero;
+        var curve = Curves.fastOutSlowIn;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
+}
+
+/*
+import 'package:flutter/material.dart';
+import '../containers/category_card.dart';
+import '../screens/category_screen.dart';
+import '../storage.dart';
+
+class Storage.categoriesScreen extends StatelessWidget {
+  List<String> categories = [
+//    'All',
+    'Atta & Flour',
+    'Beverages',
+    'Body Sprays',
+    'Chocolates',
+    'Cleaners',
+    'Dals & Pulses',
+    'Dairy',
+    'Dry Fruits',
+    'Edible Oils',
+    'Hair Oils',
+    'Masala',
+    'Patanjali',
+    'Personal Hygiene',
+    'Pooja Products',
+    'Rice & Rice Products',
+    'Salt, Sugar & Tea',
+    'Snacks and Food',
+    'Soaps and Shampoo',
+    'Spices',
+    'Stationary',
+    'Vegetables',
+//    'Others',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Storage.APP_COLOR,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4),
+        child: LayoutBuilder(builder: (context, constraints) {
+          if (constraints.maxWidth <= 600) {
+            return GridView.count(
+              crossAxisCount: 2,
+              children: List.generate(Storage.categories.length, (index) {
+                return CategoryCard(
+                  Storage.categories[index],
+                  onTap: () {
+                    Navigator.of(context).push(createRoute(CategoryScreen(
+                        Storage.categories[index],
+                        products: List.from(Storage.products.where((element) {
+                      return element['c'] == Storage.categories[index];
+                    })))));
+                  },
+                  index: (index % 2) + 1,
+                );
+              }).toList(),
+            );
+          } else {
+            return GridView.count(
+              crossAxisCount: 4,
+              children: List.generate(Storage.categories.length, (index) {
+                return CategoryCard(
+                  Storage.categories[index],
+                  onTap: () {
+                    Navigator.of(context).push(createRoute(CategoryScreen(
+                        Storage.categories[index],
+                        products: List.from(Storage.products.where((element) {
+                      return element['c'] == Storage.categories[index];
+                    })))));
+                  },
+                  index: (index % 2) + 1,
+                );
+              }).toList(),
+            );
+          }
+        }),
+      ),
+    );
+  }
+
+  Route createRoute(dest) {
+    return PageRouteBuilder(
+      transitionDuration: Duration(milliseconds: 500),
+      pageBuilder: (context, animation, secondaryAnimation) => dest,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        var begin = Offset(0, 1);
+        var end = Offset.zero;
+        var curve = Curves.fastOutSlowIn;
+
+        var tween =
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+        return SlideTransition(
+          position: animation.drive(tween),
+          child: child,
+        );
+      },
+    );
+  }
+}
+*/
