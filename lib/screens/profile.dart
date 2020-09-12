@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../screens/orders.dart';
-import '../screens/login.dart';
-import '../storage.dart';
 import 'package:share/share.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+import '../screens/login.dart';
+import '../screens/orders.dart';
+import '../storage.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -146,6 +148,44 @@ class _ProfileState extends State<Profile> {
                             Border(bottom: BorderSide(color: Colors.black26))),
                     child: Text(
                       'Share',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(createRoute(
+                      Scaffold(
+                        appBar: AppBar(
+                          title: Text(
+                            'Full Time Develeopers (FTD)',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          iconTheme: IconThemeData(color: Colors.black),
+                          backgroundColor: Colors.white,
+                          elevation: 0,
+                        ),
+                        body: WebView(
+                          debuggingEnabled: false,
+                          javascriptMode: JavascriptMode.unrestricted,
+                          onWebViewCreated: (c) {
+                            c.loadUrl(
+                                'https://fulltimedevs-aboutus.netlify.app/');
+                          },
+                        ),
+                      ),
+                    ));
+                  },
+                  child: Container(
+                    margin:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        border:
+                            Border(bottom: BorderSide(color: Colors.black26))),
+                    child: Text(
+                      'About Us',
                       style: TextStyle(fontSize: 20),
                     ),
                   ),
