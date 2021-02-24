@@ -1,13 +1,13 @@
 import 'package:android_intent/android_intent.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_webservice/places.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../storage.dart';
-import '../screens/splash_screen.dart';
-import '../service/notification_handler.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/places.dart';
+
+import '../screens/splash_screen.dart';
+import '../storage.dart';
 
 class UserDetailsInput extends StatefulWidget {
   final String uid;
@@ -232,6 +232,7 @@ class _UserDetailsInputState extends State<UserDetailsInput>
                                           await PlacesAutocomplete.show(
                                               context: context,
                                               apiKey:
+                                                  /*"AIzaSyB0Gn_y7plgUKd5nlHIbRmyloyrvSd_FM4",*/
                                                   "AIzaSyD3Mp-nbpxvDIUmjL9MWCDil6AypsFcCVQ",
                                               mode: Mode.overlay,
                                               // Mode.fullscreen
@@ -333,7 +334,8 @@ class _UserDetailsInputState extends State<UserDetailsInput>
       Prediction p, GlobalKey<ScaffoldState> homeScaffoldKey) async {
     if (p != null) {
       PlacesDetailsResponse detailsResponse = await GoogleMapsPlaces(
-              apiKey: "AIzaSyD3Mp-nbpxvDIUmjL9MWCDil6AypsFcCVQ")
+              apiKey:
+                  "AIzaSyD3Mp-nbpxvDIUmjL9MWCDil6AypsFcCVQ") /*AIzaSyB0Gn_y7plgUKd5nlHIbRmyloyrvSd_FM4*/
           .getDetailsByPlaceId(p.placeId);
       custLoc = new LatLng(detailsResponse.result.geometry.location.lat,
           detailsResponse.result.geometry.location.lng);

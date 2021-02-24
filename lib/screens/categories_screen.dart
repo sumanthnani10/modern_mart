@@ -1,4 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
+
 import '../containers/focused_menu.dart';
 import '../screens/category_screen.dart';
 import '../storage.dart';
@@ -26,133 +29,181 @@ class _CategoriesScreenState extends State<CategoriesScreen>
         padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
         child: Storage.cart == null
             ? Column(
-                children: <Widget>[
+          children: <Widget>[
                   LinearProgressIndicator(),
+                  Container(
+                    constraints: BoxConstraints(maxWidth: 360),
+                    color: Colors.white,
+                    child: AspectRatio(
+                      aspectRatio: 4 / 2,
+                      child: Carousel(
+                        showIndicator: false,
+                        autoplay: false,
+                        defaultImage: Image.asset('assets/logo/logo.jpg'),
+                        images: [],
+                      ),
+                    ),
+                  ),
                 ],
-              )
+        )
             : SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Container(
+                            constraints: BoxConstraints(maxWidth: 360),
+                            color: Colors.white,
+                            child: AspectRatio(
+                              aspectRatio: 4 / 2,
+                              child: Carousel(
+                                showIndicator: false,
+                                autoplay: true,
+                                defaultImage:
+                                    Image.asset('assets/logo/logo.jpg'),
+                                images: List.generate(
+                                    Storage.shop_details['sliders'].length,
+                                    (index) => CachedNetworkImage(
+                                          progressIndicatorBuilder:
+                                              (context, url, progress) =>
+                                                  CircularProgressIndicator(
+                                            value: progress.progress,
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              Center(child: Text('Image')),
+                                          useOldImageOnUrlChange: true,
+                                          imageUrl:
+                                              'https://firebasestorage.googleapis.com/v0/b/modern-mart.appspot.com/o/Sliders%2Fimage1?alt=media&token=' +
+                                                  Storage.shop_details[
+                                                      'sliders'][index]['url'],
+                                          fit: BoxFit.cover,
+                                        )),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ] +
+                      List<Widget>.generate(categories.length, (i) {
+                        if (categories[i] == categories[0]) {
+                          t = Storage.products.toList();
+                          t.sort((a, b) {
+                            if (b
+                                .data()['o']
+                                .toDate()
+                                .isBefore(a.data()['o'].toDate()))
+                              return -1;
+                            else
+                              return 1;
+                          });
+              } else {
+                t = List.from(Storage.products.where((element) {
+                  return element.data()['c'] == i - 1;
+                }));
+              }
+              if (t.length == 0) {
+                return Container();
+              } else {
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: List.generate(categories.length, (i) {
-                    if (categories[i] == categories[0]) {
-                      t = Storage.products.toList();
-                      t.sort((a, b) {
-                        if (b
-                            .data()['o']
-                            .toDate()
-                            .isBefore(a.data()['o'].toDate()))
-                          return -1;
-                        else
-                          return 1;
-                      });
-                    } else {
-                      t = List.from(Storage.products.where((element) {
-                        return element.data()['c'] == i - 1;
-                      }));
-                    }
-                    if (t.length == 0) {
-                      return Container();
-                    } else {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Padding(
+                      padding:
+                      const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text(
-                                  categories[i],
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600),
+                          Text(
+                            categories[i],
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600),
+                          ),
+                          if (categories[i] != categories[0])
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(createRoute(
+                                    CategoryScreen(categories[i],
+                                        products: List.from(Storage
+                                            .products
+                                            .where((element) {
+                                          return element.data()['c'] == i - 1;
+                                        })))));
+                              },
+                              child: Text(
+                                'More',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.indigo,
                                 ),
-                                if (categories[i] != categories[0])
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.of(context).push(createRoute(
-                                          CategoryScreen(categories[i],
-                                              products: List.from(Storage
-                                                  .products
-                                                  .where((element) {
-                                        return element.data()['c'] == i - 1;
-                                      })))));
-                                    },
-                                    child: Text(
-                                      'More',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.indigo,
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    SingleChildScrollView(
+                      physics: BouncingScrollPhysics(),
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: List<Widget>.generate(
+                            t.length < 5 ? t.length : 5, (index) {
+                          return ProductCard(
+                            snap: t[index].data(),
+                            hw: true,
+                          );
+                        }).toList() +
+                            [
+                              if (categories[i] != categories[0])
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        createRoute(CategoryScreen(
+                                            categories[i], products:
+                                        List.from(Storage.products
+                                            .where((element) {
+                                          return element.data()['c'] == i - 1;
+                                        })))));
+                                  },
+                                  child: Container(
+                                    width: 160,
+                                    height: 236,
+                                    child: Card(
+                                      elevation: 4,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                        BorderRadius.circular(8),
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                        children: <Widget>[
+                                          Text(
+                                            'More',
+                                            style: TextStyle(
+                                                fontSize: 20,
+                                                color: Colors.indigo),
+                                          )
+                                        ],
                                       ),
                                     ),
                                   ),
-                              ],
-                            ),
-                          ),
-                          SingleChildScrollView(
-                            physics: BouncingScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: List<Widget>.generate(
-                                      t.length < 5 ? t.length : 5, (index) {
-                                    return ProductCard(
-                                      snap: t[index].data(),
-                                      hw: true,
-                                    );
-                                  }).toList() +
-                                  [
-                                    if (categories[i] != categories[0])
-                                      InkWell(
-                                        onTap: () {
-                                          Navigator.of(context).push(
-                                              createRoute(CategoryScreen(
-                                                  categories[i], products:
-                                                      List.from(Storage.products
-                                                          .where((element) {
-                                            return element.data()['c'] == i - 1;
-                                          })))));
-                                        },
-                                        child: Container(
-                                          width: 160,
-                                          height: 236,
-                                          child: Card(
-                                            elevation: 4,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: <Widget>[
-                                                Text(
-                                                  'More',
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      color: Colors.indigo),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                  ],
-                            ),
-                          ),
-                          SizedBox(
-                            height: 4,
-                          )
-                        ],
-                      );
-                    }
-                  }).toList(),
-                ),
-              ),
+                                )
+                            ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 4,
+                    )
+                  ],
+                );
+              }
+            }).toList(),
+          ),
+        ),
       ),
     );
   }
@@ -167,7 +218,7 @@ class _CategoriesScreenState extends State<CategoriesScreen>
         var curve = Curves.fastOutSlowIn;
 
         var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
         return SlideTransition(
           position: animation.drive(tween),

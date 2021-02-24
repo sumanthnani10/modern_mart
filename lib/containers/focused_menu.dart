@@ -1,9 +1,11 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import '../storage.dart';
+
 import '../screens/product_view_screen.dart';
+import '../storage.dart';
 
 class ProductCard extends StatefulWidget {
   var snap;
@@ -90,9 +92,16 @@ class _ProductCardState extends State<ProductCard>
             borderRadius: BorderRadius.circular(8),
             child: AspectRatio(
               aspectRatio: 3 / 2,
-              child: Image(
-                image: NetworkImage(
-                    Storage.getImageURL(widget.snap['id']) + widget.snap['i']),
+              child: CachedNetworkImage(
+                progressIndicatorBuilder: (context, url, progress) =>
+                    CircularProgressIndicator(
+                  value: progress.progress,
+                ),
+                errorWidget: (context, url, error) =>
+                    Center(child: Text('Image')),
+                useOldImageOnUrlChange: true,
+                imageUrl:
+                    Storage.getImageURL(widget.snap['id']) + widget.snap['i'],
                 fit: BoxFit.cover,
               ),
             ),

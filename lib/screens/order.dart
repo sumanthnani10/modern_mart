@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import '../screens/product_view_screen.dart';
 import '../storage.dart';
 
@@ -71,289 +73,298 @@ class _OrderState extends State<Order> {
       ),
       body: loaded
           ? Padding(
-              padding: const EdgeInsets.all(8),
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                          InkWell(
-                            child: Container(
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 14),
-                                    child: LinearProgressIndicator(
-                                      value: progress,
-                                      //0.12,0.36,0.64,1
+        padding: const EdgeInsets.all(8),
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                InkWell(
+                  child: Container(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 14),
+                          child: LinearProgressIndicator(
+                            value: progress,
+                            //0.12,0.36,0.64,1
+                            backgroundColor: Colors.white,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                order['det']['stage'] != 'Rejected'
+                                    ? Colors.blue
+                                    : Colors.redAccent),
+                          ),
+                        ),
+                        if (order['det']['stage'] != 'Rejected')
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0),
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      'Placed',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14),
+                                    ),
+                                    CircleAvatar(
+                                      radius: 10,
                                       backgroundColor: Colors.white,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          order['det']['stage'] != 'Rejected'
-                                              ? Colors.blue
-                                              : Colors.redAccent),
                                     ),
-                                  ),
-                                  if (order['det']['stage'] != 'Rejected')
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(
-                                                'Placed',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 14),
-                                              ),
-                                              CircleAvatar(
-                                                radius: 10,
-                                                backgroundColor: Colors.white,
-                                              ),
-                                              Text(
-                                                '${order['time']['pla'].toDate().hour > 12 ? order['time']['pla'].toDate().hour - 12 : order['time']['pla'].toDate().hour}:${order['time']['pla'].toDate().minute} ${order['time']['pla'].toDate().hour > 12 ? 'PM' : 'AM'}\n${order['time']['pla'].toDate().day}-${order['time']['pla'].toDate().month}-${order['time']['pla'].toDate().year}',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(fontSize: 12),
-                                              )
-                                            ],
-                                          ),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(
-                                                'Accepted',
-                                                style: TextStyle(
-                                                    fontWeight: order['time']
-                                                                ['acc'] !=
-                                                            null
-                                                        ? FontWeight.w600
-                                                        : FontWeight.normal,
-                                                    fontSize: 14),
-                                              ),
-                                              CircleAvatar(
-                                                radius:
-                                                    order['time']['acc'] != null
-                                                        ? 10
-                                                        : 6,
-                                                backgroundColor:
-                                                    order['time']['acc'] != null
-                                                        ? Colors.white
-                                                        : Colors.grey,
-                                              ),
-                                              Text(
-                                                order['time']['acc'] != null
-                                                    ? '${order['time']['acc'].toDate().hour > 12 ? order['time']['acc'].toDate().hour - 12 : order['time']['acc'].toDate().hour}:${order['time']['acc'].toDate().minute} ${order['time']['acc'].toDate().hour > 12 ? 'PM' : 'AM'}\n${order['time']['acc'].toDate().day}-${order['time']['acc'].toDate().month}-${order['time']['acc'].toDate().year}'
-                                                    : '\n',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(fontSize: 12),
-                                              )
-                                            ],
-                                          ),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(
-                                                'Packed',
-                                                style: TextStyle(
-                                                    fontWeight: order['time']
-                                                                ['pac'] !=
-                                                            null
-                                                        ? FontWeight.w600
-                                                        : FontWeight.normal,
-                                                    fontSize: 14),
-                                              ),
-                                              CircleAvatar(
-                                                radius:
-                                                    order['time']['pac'] != null
-                                                        ? 10
-                                                        : 6,
-                                                backgroundColor:
-                                                    order['time']['pac'] != null
-                                                        ? Colors.white
-                                                        : Colors.grey,
-                                              ),
-                                              Text(
-                                                order['time']['pac'] != null
-                                                    ? '${order['time']['pac'].toDate().hour > 12 ? order['time']['pac'].toDate().hour - 12 : order['time']['pac'].toDate().hour}:${order['time']['pac'].toDate().minute} ${order['time']['pac'].toDate().hour > 12 ? 'PM' : 'AM'}\n${order['time']['pac'].toDate().day}-${order['time']['pac'].toDate().month}-${order['time']['pac'].toDate().year}'
-                                                    : '\n',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(fontSize: 12),
-                                              )
-                                            ],
-                                          ),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(
-                                                'Delivered',
-                                                style: TextStyle(
-                                                    fontWeight: order['time']
-                                                                ['del'] !=
-                                                            null
-                                                        ? FontWeight.w600
-                                                        : FontWeight.normal,
-                                                    fontSize: 14),
-                                              ),
-                                              CircleAvatar(
-                                                radius:
-                                                    order['time']['del'] != null
-                                                        ? 10
-                                                        : 6,
-                                                backgroundColor:
-                                                    order['time']['del'] != null
-                                                        ? Colors.white
-                                                        : Colors.grey,
-                                              ),
-                                              Text(
-                                                order['time']['del'] != null
-                                                    ? '${order['time']['del'].toDate().hour > 12 ? order['time']['del'].toDate().hour - 12 : order['time']['del'].toDate().hour}:${order['time']['del'].toDate().minute} ${order['time']['del'].toDate().hour > 12 ? 'PM' : 'AM'}\n${order['time']['del'].toDate().day}-${order['time']['del'].toDate().month}-${order['time']['del'].toDate().year}'
-                                                    : '\n',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(fontSize: 12),
-                                              )
-                                            ],
-                                          ),
-                                        ],
+                                    Text(
+                                      '${order['time']['pla'].toDate().hour > 12 ? order['time']['pla'].toDate().hour - 12 : order['time']['pla'].toDate().hour}:${order['time']['pla'].toDate().minute} ${order['time']['pla'].toDate().hour > 12 ? 'PM' : 'AM'}\n${order['time']['pla'].toDate().day}-${order['time']['pla'].toDate().month}-${order['time']['pla'].toDate().year}',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 12),
+                                    )
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      'Accepted',
+                                      style: TextStyle(
+                                          fontWeight: order['time']
+                                          ['acc'] !=
+                                              null
+                                              ? FontWeight.w600
+                                              : FontWeight.normal,
+                                          fontSize: 14),
+                                    ),
+                                    CircleAvatar(
+                                      radius:
+                                      order['time']['acc'] != null
+                                          ? 10
+                                          : 6,
+                                      backgroundColor:
+                                      order['time']['acc'] != null
+                                          ? Colors.white
+                                          : Colors.grey,
+                                    ),
+                                    Text(
+                                      order['time']['acc'] != null
+                                          ? '${order['time']['acc'].toDate().hour > 12 ? order['time']['acc'].toDate().hour - 12 : order['time']['acc'].toDate().hour}:${order['time']['acc'].toDate().minute} ${order['time']['acc'].toDate().hour > 12 ? 'PM' : 'AM'}\n${order['time']['acc'].toDate().day}-${order['time']['acc'].toDate().month}-${order['time']['acc'].toDate().year}'
+                                          : '\n',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 12),
+                                    )
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      'Packed',
+                                      style: TextStyle(
+                                          fontWeight: order['time']
+                                          ['pac'] !=
+                                              null
+                                              ? FontWeight.w600
+                                              : FontWeight.normal,
+                                          fontSize: 14),
+                                    ),
+                                    CircleAvatar(
+                                      radius:
+                                      order['time']['pac'] != null
+                                          ? 10
+                                          : 6,
+                                      backgroundColor:
+                                      order['time']['pac'] != null
+                                          ? Colors.white
+                                          : Colors.grey,
+                                    ),
+                                    Text(
+                                      order['time']['pac'] != null
+                                          ? '${order['time']['pac'].toDate().hour > 12 ? order['time']['pac'].toDate().hour - 12 : order['time']['pac'].toDate().hour}:${order['time']['pac'].toDate().minute} ${order['time']['pac'].toDate().hour > 12 ? 'PM' : 'AM'}\n${order['time']['pac'].toDate().day}-${order['time']['pac'].toDate().month}-${order['time']['pac'].toDate().year}'
+                                          : '\n',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 12),
+                                    )
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      'Delivered',
+                                      style: TextStyle(
+                                          fontWeight: order['time']
+                                          ['del'] !=
+                                              null
+                                              ? FontWeight.w600
+                                              : FontWeight.normal,
+                                          fontSize: 14),
+                                    ),
+                                    CircleAvatar(
+                                      radius:
+                                      order['time']['del'] != null
+                                          ? 10
+                                          : 6,
+                                      backgroundColor:
+                                      order['time']['del'] != null
+                                          ? Colors.white
+                                          : Colors.grey,
+                                    ),
+                                    Text(
+                                      order['time']['del'] != null
+                                          ? '${order['time']['del'].toDate().hour > 12 ? order['time']['del'].toDate().hour - 12 : order['time']['del'].toDate().hour}:${order['time']['del'].toDate().minute} ${order['time']['del'].toDate().hour > 12 ? 'PM' : 'AM'}\n${order['time']['del'].toDate().day}-${order['time']['del'].toDate().month}-${order['time']['del'].toDate().year}'
+                                          : '\n',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 12),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        if (order['det']['stage'] == 'Rejected')
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0),
+                            child: Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      'Placed',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14),
+                                    ),
+                                    CircleAvatar(
+                                      radius: 10,
+                                      backgroundColor: Colors.white,
+                                    ),
+                                    Text(
+                                      '${order['time']['pla'].toDate().hour > 12 ? order['time']['pla'].toDate().hour - 12 : order['time']['pla'].toDate().hour}:${order['time']['pla'].toDate().minute} ${order['time']['pla'].toDate().hour > 12 ? 'PM' : 'AM'}\n${order['time']['pla'].toDate().day}-${order['time']['pla'].toDate().month}-${order['time']['pla'].toDate().year}',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 12),
+                                    )
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      'Rejected',
+                                      style: TextStyle(
+                                          fontWeight: order['time']
+                                          ['rej'] !=
+                                              null
+                                              ? FontWeight.w600
+                                              : FontWeight.normal,
+                                          fontSize: 14),
+                                    ),
+                                    CircleAvatar(
+                                      radius:
+                                      order['time']['rej'] != null
+                                          ? 10
+                                          : 6,
+                                      backgroundColor:
+                                      order['time']['rej'] != null
+                                          ? Colors.white
+                                          : Colors.grey,
+                                    ),
+                                    Text(
+                                      order['time']['rej'] != null
+                                          ? '${order['time']['rej'].toDate().hour > 12 ? order['time']['rej'].toDate().hour - 12 : order['time']['rej'].toDate().hour}:${order['time']['rej'].toDate().minute} ${order['time']['rej'].toDate().hour > 12 ? 'PM' : 'AM'}\n${order['time']['rej'].toDate().day}-${order['time']['rej'].toDate().month}-${order['time']['rej'].toDate().year}'
+                                          : '\n',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 12),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+                InkWell(
+                    child: SizedBox(
+                      height: 8,
+                    )),
+                InkWell(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Address:',
+                        style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600)),
+                  ),
+                ),
+                InkWell(
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                        '${Storage.user['fn']} ${Storage.user['ln']}\n${Storage.user['a']}'),
+                  ),
+                ),
+                InkWell(
+                    child: SizedBox(
+                      height: 16,
+                    )),
+                InkWell(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Products:',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w600),
+                      ),
+                    ))
+              ] +
+                  List.generate(order['len'], (i) {
+                    return InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(createRoute(Product(
+                          product: Storage
+                              .productsMap[order['prods'][i]['id']]
+                              .data(),
+                        )));
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        constraints:
+                        BoxConstraints(maxWidth: 400, maxHeight: 98),
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                                    child: CachedNetworkImage(
+                                      progressIndicatorBuilder:
+                                          (context, url, progress) =>
+                                              CircularProgressIndicator(
+                                        value: progress.progress,
                                       ),
-                                    ),
-                                  if (order['det']['stage'] == 'Rejected')
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: <Widget>[
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(
-                                                'Placed',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 14),
-                                              ),
-                                              CircleAvatar(
-                                                radius: 10,
-                                                backgroundColor: Colors.white,
-                                              ),
-                                              Text(
-                                                '${order['time']['pla'].toDate().hour > 12 ? order['time']['pla'].toDate().hour - 12 : order['time']['pla'].toDate().hour}:${order['time']['pla'].toDate().minute} ${order['time']['pla'].toDate().hour > 12 ? 'PM' : 'AM'}\n${order['time']['pla'].toDate().day}-${order['time']['pla'].toDate().month}-${order['time']['pla'].toDate().year}',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(fontSize: 12),
-                                              )
-                                            ],
-                                          ),
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text(
-                                                'Rejected',
-                                                style: TextStyle(
-                                                    fontWeight: order['time']
-                                                                ['rej'] !=
-                                                            null
-                                                        ? FontWeight.w600
-                                                        : FontWeight.normal,
-                                                    fontSize: 14),
-                                              ),
-                                              CircleAvatar(
-                                                radius:
-                                                    order['time']['rej'] != null
-                                                        ? 10
-                                                        : 6,
-                                                backgroundColor:
-                                                    order['time']['rej'] != null
-                                                        ? Colors.white
-                                                        : Colors.grey,
-                                              ),
-                                              Text(
-                                                order['time']['rej'] != null
-                                                    ? '${order['time']['rej'].toDate().hour > 12 ? order['time']['rej'].toDate().hour - 12 : order['time']['rej'].toDate().hour}:${order['time']['rej'].toDate().minute} ${order['time']['rej'].toDate().hour > 12 ? 'PM' : 'AM'}\n${order['time']['rej'].toDate().day}-${order['time']['rej'].toDate().month}-${order['time']['rej'].toDate().year}'
-                                                    : '\n',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(fontSize: 12),
-                                              )
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          InkWell(
-                              child: SizedBox(
-                            height: 8,
-                          )),
-                          InkWell(
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text('Address:',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w600)),
-                            ),
-                          ),
-                          InkWell(
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                  '${Storage.user['fn']} ${Storage.user['ln']}\n${Storage.user['a']}'),
-                            ),
-                          ),
-                          InkWell(
-                              child: SizedBox(
-                            height: 16,
-                          )),
-                          InkWell(
-                              child: Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              'Products:',
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.w600),
-                            ),
-                          ))
-                        ] +
-                        List.generate(order['len'], (i) {
-                          return InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(createRoute(Product(
-                                product: Storage
-                                    .productsMap[order['prods'][i]['id']]
-                                    .data(),
-                              )));
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              margin: const EdgeInsets.symmetric(vertical: 4),
-                              constraints:
-                                  BoxConstraints(maxWidth: 400, maxHeight: 98),
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(8)),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(8),
-                                    child: Image.network(
-                                      Storage.getImageURL(Storage.productsMap[
-                                              order['prods'][i]['id']]['id']) +
+                                      errorWidget: (context, url, error) =>
+                                          Center(child: Text('Image')),
+                                      useOldImageOnUrlChange: true,
+                                      imageUrl: Storage.getImageURL(
+                                              Storage.productsMap[order['prods']
+                                                  [i]['id']]['id']) +
                                           Storage.productsMap[order['prods'][i]
                                               ['id']]['i'],
                                       fit: BoxFit.cover,
@@ -361,99 +372,99 @@ class _OrderState extends State<Order> {
                                       height: 90,
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: 4,
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Container(
+                              width: 220,
+                              child: Column(
+                                mainAxisAlignment:
+                                MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    Storage.productsMap[order['prods'][i]
+                                    ['id']]['n'],
+                                    maxLines: 1,
+                                    softWrap: true,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(fontSize: 16),
                                   ),
-                                  Container(
-                                    width: 220,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.max,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(
-                                          Storage.productsMap[order['prods'][i]
-                                              ['id']]['n'],
-                                          maxLines: 1,
-                                          softWrap: true,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(fontSize: 16),
-                                        ),
-                                        Text(
-                                          Storage.categories[
-                                              Storage.productsMap[order['prods']
-                                                  [i]['id']]['c']],
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.black54),
-                                        ),
-                                        Text(
-                                          'Qty: ${order['prods'][i]['q']}',
-                                          style: TextStyle(fontSize: 12),
-                                        ),
-                                      ],
-                                    ),
+                                  Text(
+                                    Storage.categories[
+                                    Storage.productsMap[order['prods']
+                                    [i]['id']]['c']],
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        color: Colors.black54),
+                                  ),
+                                  Text(
+                                    'Qty: ${order['prods'][i]['q']}',
+                                    style: TextStyle(fontSize: 12),
                                   ),
                                 ],
                               ),
                             ),
-                          );
-                        }).toList()),
-              ),
-            )
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList()),
+        ),
+      )
           : LinearProgressIndicator(),
       bottomNavigationBar: loaded
           ? Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(12),
-                      topRight: Radius.circular(12))),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Text('Total:  '),
-                  Row(
-                    children: <Widget>[
-                      RupeeText(
-                        amount: order['price']['tot'],
-                        color: Colors.green,
-                        fontWeight: FontWeight.w800,
-                        size: order['price']['del'] != 0 ? 24 : 22,
-                      ),
-                      if (order['price']['del'] != 0)
-                        Text(
-                          ' + Rs.${order['price']['del']} (Delivery)',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                    ],
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(12),
+                topRight: Radius.circular(12))),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text('Total:  '),
+            Row(
+              children: <Widget>[
+                RupeeText(
+                  amount: order['price']['tot'],
+                  color: Colors.green,
+                  fontWeight: FontWeight.w800,
+                  size: order['price']['del'] != 0 ? 24 : 22,
+                ),
+                if (order['price']['del'] != 0)
+                  Text(
+                    ' + Rs.${order['price']['del']} (Delivery)',
+                    style: TextStyle(fontSize: 14),
                   ),
-                  if (order['price']['sav'] != 0)
-                    Row(
-                      children: <Widget>[
-                        Text(
-                          order['price']['mrp'].toString(),
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.red,
-                            decoration: TextDecoration.lineThrough,
-                          ),
-                        ),
-                        Text(' (You Save: ${order['price']['sav']}%)',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.green,
-                            )),
-                      ],
+              ],
+            ),
+            if (order['price']['sav'] != 0)
+              Row(
+                children: <Widget>[
+                  Text(
+                    order['price']['mrp'].toString(),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.red,
+                      decoration: TextDecoration.lineThrough,
                     ),
+                  ),
+                  Text(' (You Save: ${order['price']['sav']}%)',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.green,
+                      )),
                 ],
               ),
-            )
+          ],
+        ),
+      )
           : Container(),
       backgroundColor: Storage.APP_COLOR,
     );
@@ -469,7 +480,7 @@ class _OrderState extends State<Order> {
         var curve = Curves.fastOutSlowIn;
 
         var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
         return SlideTransition(
           position: animation.drive(tween),
@@ -517,12 +528,11 @@ class RupeeText extends StatelessWidget {
   FontWeight fontWeight = FontWeight.normal;
   TextDecoration textDecoration = TextDecoration.none;
 
-  RupeeText(
-      {this.amount,
-      this.color,
-      this.size,
-      this.fontWeight,
-      this.textDecoration});
+  RupeeText({this.amount,
+    this.color,
+    this.size,
+    this.fontWeight,
+    this.textDecoration});
 
   @override
   Widget build(BuildContext context) {

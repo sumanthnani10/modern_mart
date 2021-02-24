@@ -5,15 +5,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../screens/order.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../containers/title_text.dart';
 import '../screens/categories_screen.dart';
+import '../screens/order.dart';
 import '../screens/products_screen.dart';
 import '../screens/profile.dart';
 import '../storage.dart';
-import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class BottomNavBar extends StatefulWidget {
   @override
@@ -29,7 +30,7 @@ class _BottomNavBarState extends State<BottomNavBar>
     Colors.cyanAccent,
     Colors.deepOrangeAccent
   ];
-  int sel = 2;
+  int sel = 0;
   String appBarTitle = 'Home';
   TabController tabController;
 
@@ -38,7 +39,7 @@ class _BottomNavBarState extends State<BottomNavBar>
 
   @override
   void initState() {
-    tabController = new TabController(length: 4, vsync: this, initialIndex: 2);
+    tabController = new TabController(length: 4, vsync: this, initialIndex: 0);
     tabController.addListener(() {
       setState(() {
         int i = tabController.index;

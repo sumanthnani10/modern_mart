@@ -1,12 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import '../storage.dart';
+
 import '../screens/bottom_nav.dart';
 import '../screens/login.dart';
 import '../screens/user_details_input.dart';
-import '../service/notification_handler.dart';
+import '../storage.dart';
 
 class SplashScreen extends StatefulWidget {
   final nkey;
@@ -118,8 +119,16 @@ class _SplashScreenState extends State<SplashScreen> {
                         AlwaysStoppedAnimation<Color>(Storage.APP_COLOR),
                   )),
               Spacer(),
-              Image.network(
-                'https://firebasestorage.googleapis.com/v0/b/modern-mart.appspot.com/o/Images%2Fftd_logo.png?alt=media&token=8f3d7a03-67e1-488f-ac61-18a00d12a278',
+              CachedNetworkImage(
+                progressIndicatorBuilder: (context, url, progress) =>
+                    CircularProgressIndicator(
+                  value: progress.progress,
+                ),
+                errorWidget: (context, url, error) =>
+                    Center(child: Text('FTD')),
+                useOldImageOnUrlChange: true,
+                imageUrl:
+                    'https://firebasestorage.googleapis.com/v0/b/modern-mart.appspot.com/o/Images%2Fftd_logo.png?alt=media&token=8f3d7a03-67e1-488f-ac61-18a00d12a278',
                 width: 100,
               ),
               SizedBox(
@@ -142,7 +151,7 @@ class _SplashScreenState extends State<SplashScreen> {
         var curve = Curves.fastOutSlowIn;
 
         var tween =
-            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+        Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
         return SlideTransition(
           position: animation.drive(tween),

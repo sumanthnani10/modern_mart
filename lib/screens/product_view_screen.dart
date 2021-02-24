@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../screens/cart.dart';
 import '../storage.dart';
 
@@ -76,8 +78,8 @@ class _ProductState extends State<Product> {
                     label: Text(
                       Storage.cart != null
                           ? Storage.cart.length != 0
-                              ? 'Cart (${Storage.cart.length})'
-                              : 'Cart'
+                          ? 'Cart (${Storage.cart.length})'
+                          : 'Cart'
                           : 'Cart',
                       style: TextStyle(
                         color: Colors.black,
@@ -100,12 +102,26 @@ class _ProductState extends State<Product> {
                   dotPosition: DotPosition.bottomLeft,
                   dotIncreaseSize: 1.5,
                   images: <Widget>[
-                    Image.network(
-                      Storage.getImageURL(widget.product['id']) +
+                    CachedNetworkImage(
+                      progressIndicatorBuilder: (context, url, progress) =>
+                          CircularProgressIndicator(
+                        value: progress.progress,
+                      ),
+                      errorWidget: (context, url, error) =>
+                          Center(child: Text('Image')),
+                      useOldImageOnUrlChange: true,
+                      imageUrl: Storage.getImageURL(widget.product['id']) +
                           widget.product['i'],
                     ),
-                    Image.network(
-                      Storage.getImageURL(widget.product['id']) +
+                    CachedNetworkImage(
+                      progressIndicatorBuilder: (context, url, progress) =>
+                          CircularProgressIndicator(
+                        value: progress.progress,
+                      ),
+                      errorWidget: (context, url, error) =>
+                          Center(child: Text('Image')),
+                      useOldImageOnUrlChange: true,
+                      imageUrl: Storage.getImageURL(widget.product['id']) +
                           widget.product['i'],
                       fit: BoxFit.cover,
                     ),
@@ -115,33 +131,33 @@ class _ProductState extends State<Product> {
             ),
             SliverToBoxAdapter(
                 child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    widget.product['n'],
-                    maxLines: 2,
-                    style: TextStyle(fontSize: 24),
-                  ),
-                  Text(
-                    Storage.categories[widget.product['c']],
-                    style: TextStyle(fontSize: 14, color: Colors.black54),
-                  ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  Text(
-                    'Variants :',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: List.generate(widget.product['p'], (index) {
-                      //CHANGED CART
-                      /*var t;
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        widget.product['n'],
+                        maxLines: 2,
+                        style: TextStyle(fontSize: 24),
+                      ),
+                      Text(
+                        Storage.categories[widget.product['c']],
+                        style: TextStyle(fontSize: 14, color: Colors.black54),
+                      ),
+                      SizedBox(
+                        height: 16,
+                      ),
+                      Text(
+                        'Variants :',
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: List.generate(widget.product['p'], (index) {
+                          //CHANGED CART
+                          /*var t;
                       if ((t = Storage.cart.singleWhere((element) {
                             return element.id ==
                                 '${widget.product['id']}${index + 1}';
@@ -157,73 +173,73 @@ class _ProductState extends State<Product> {
                                 '${widget.product['id']}${index + 1}'] =
                             null;
                       }*/
-                      if (Storage.cart_keys
-                          .contains('${widget.product['id']}${index + 1}')) {
-                        variants['${widget.product['id']}${index + 1}'] =
+                          if (Storage.cart_keys
+                              .contains('${widget.product['id']}${index + 1}')) {
+                            variants['${widget.product['id']}${index + 1}'] =
                             Storage.cart['${widget.product['id']}${index + 1}'];
-                      } else {
-                        variants['${widget.product['id']}${index + 1}'] = null;
-                      }
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              widget.product['q${index + 1}'].toString() != '0'
-                                  ? 'Rs.${widget.product['dp${index + 1}']} - ${widget.product['q${index + 1}']}${widget.product['u${index + 1}']}'
-                                  : 'Rs.${widget.product['dp${index + 1}']}',
-                              style:
+                          } else {
+                            variants['${widget.product['id']}${index + 1}'] = null;
+                          }
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  widget.product['q${index + 1}'].toString() != '0'
+                                      ? 'Rs.${widget.product['dp${index + 1}']} - ${widget.product['q${index + 1}']}${widget.product['u${index + 1}']}'
+                                      : 'Rs.${widget.product['dp${index + 1}']}',
+                                  style:
                                   TextStyle(fontSize: 16, color: Colors.black),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                            ),
-                            if (widget.product['dp${index + 1}'] !=
-                                widget.product['m${index + 1}'])
-                              Row(
-                                children: <Widget>[
-                                  SizedBox(
-                                    width: 8,
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
+                                ),
+                                if (widget.product['dp${index + 1}'] !=
+                                    widget.product['m${index + 1}'])
+                                  Row(
+                                    children: <Widget>[
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      Text(
+                                        'Rs.${widget.product['m${index + 1}']}',
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.red,
+                                            decoration: TextDecoration.lineThrough,
+                                            decorationColor: Colors.black),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      Text(
+                                        '${((widget.product['m${index + 1}'] - widget.product['dp${index + 1}']) / widget.product['m${index + 1}'] * 100).round()}%',
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.green,
+                                            fontWeight: FontWeight.w600),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ],
                                   ),
-                                  Text(
-                                    'Rs.${widget.product['m${index + 1}']}',
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.red,
-                                        decoration: TextDecoration.lineThrough,
-                                        decorationColor: Colors.black),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                  SizedBox(
-                                    width: 8,
-                                  ),
-                                  Text(
-                                    '${((widget.product['m${index + 1}'] - widget.product['dp${index + 1}']) / widget.product['m${index + 1}'] * 100).round()}%',
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.w600),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
-                                  ),
-                                ],
-                              ),
-                            Spacer(),
-                            if (widget.product['s'] &&
-                                variants[
-                                        '${widget.product['id']}${index + 1}'] ==
-                                    null)
-                              RaisedButton.icon(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8)),
-                                  color: Storage.APP_COLOR,
-                                  onPressed: () async {
-                                    showLoadingDialog(
-                                        context, 'Adding to Cart');
-                                    //CHANGED CART
-                                    /*await FirebaseFirestore.instance
+                                Spacer(),
+                                if (widget.product['s'] &&
+                                    variants[
+                                    '${widget.product['id']}${index + 1}'] ==
+                                        null)
+                                  RaisedButton.icon(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8)),
+                                      color: Storage.APP_COLOR,
+                                      onPressed: () async {
+                                        showLoadingDialog(
+                                            context, 'Adding to Cart');
+                                        //CHANGED CART
+                                        /*await FirebaseFirestore.instance
                                         .collection('users')
                                         .doc(
                                             '${Storage.user['cid']}')
@@ -236,44 +252,44 @@ class _ProductState extends State<Product> {
                                       'pn': index + 1,
                                       'q': 1,
                                     });*/
-                                    await FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc('${Storage.user['cid']}')
-                                        .update({
-                                      'cart.${widget.product['id']}${index + 1}':
+                                        await FirebaseFirestore.instance
+                                            .collection('users')
+                                            .doc('${Storage.user['cid']}')
+                                            .update({
+                                          'cart.${widget.product['id']}${index + 1}':
                                           {
-                                        'id': widget.product['id'],
-                                        'pn': index + 1,
-                                        'q': 1,
-                                      }
-                                    });
-                                    Navigator.pop(context);
-                                    setState(() {});
-                                  },
-                                  icon: Icon(
-                                    Icons.shopping_basket,
-                                    size: 16,
-                                  ),
-                                  label: Text(
-                                    'Add to cart',
-                                    style: TextStyle(fontSize: 12),
-                                  )),
-                            if (widget.product['s'] &&
-                                variants[
-                                        '${widget.product['id']}${index + 1}'] !=
-                                    null)
-                              Row(
-                                children: <Widget>[
-                                  InkWell(
-                                    onTap: () async {
-                                      if (variants[
-                                                  '${widget.product['id']}${index + 1}']
-                                              ['q'] !=
-                                          1) {
-                                        showLoadingDialog(
-                                            context, 'Updating Cart');
-                                        //CHANGED CART
-                                        /*await FirebaseFirestore.instance
+                                            'id': widget.product['id'],
+                                            'pn': index + 1,
+                                            'q': 1,
+                                          }
+                                        });
+                                        Navigator.pop(context);
+                                        setState(() {});
+                                      },
+                                      icon: Icon(
+                                        Icons.shopping_basket,
+                                        size: 16,
+                                      ),
+                                      label: Text(
+                                        'Add to cart',
+                                        style: TextStyle(fontSize: 12),
+                                      )),
+                                if (widget.product['s'] &&
+                                    variants[
+                                    '${widget.product['id']}${index + 1}'] !=
+                                        null)
+                                  Row(
+                                    children: <Widget>[
+                                      InkWell(
+                                        onTap: () async {
+                                          if (variants[
+                                          '${widget.product['id']}${index + 1}']
+                                          ['q'] !=
+                                              1) {
+                                            showLoadingDialog(
+                                                context, 'Updating Cart');
+                                            //CHANGED CART
+                                            /*await FirebaseFirestore.instance
                                             .collection('users')
                                             .doc(
                                                 '${Storage.user['cid']}')
@@ -286,21 +302,21 @@ class _ProductState extends State<Product> {
                                                   ['q'] -
                                               1,
                                         });*/
-                                        await FirebaseFirestore.instance
-                                            .collection('users')
-                                            .doc('${Storage.user['cid']}')
-                                            .update({
-                                          'cart.${widget.product['id']}${index + 1}.q':
+                                            await FirebaseFirestore.instance
+                                                .collection('users')
+                                                .doc('${Storage.user['cid']}')
+                                                .update({
+                                              'cart.${widget.product['id']}${index + 1}.q':
                                               variants['${widget.product['id']}${index + 1}']
-                                                      ['q'] -
+                                              ['q'] -
                                                   1
-                                        });
-                                        Navigator.pop(context);
-                                      } else {
-                                        showLoadingDialog(
-                                            context, 'Removing from Cart');
-                                        //CHANGED CART
-                                        /*await FirebaseFirestore.instance
+                                            });
+                                            Navigator.pop(context);
+                                          } else {
+                                            showLoadingDialog(
+                                                context, 'Removing from Cart');
+                                            //CHANGED CART
+                                            /*await FirebaseFirestore.instance
                                             .collection('users')
                                             .doc(
                                                 '${Storage.user['cid']}')
@@ -308,49 +324,49 @@ class _ProductState extends State<Product> {
                                             .doc(
                                                 '${widget.product['id']}${index + 1}')
                                             .delete();*/
-                                        await FirebaseFirestore.instance
-                                            .collection('users')
-                                            .doc('${Storage.user['cid']}')
-                                            .update({
-                                          'cart.${widget.product['id']}${index + 1}':
+                                            await FirebaseFirestore.instance
+                                                .collection('users')
+                                                .doc('${Storage.user['cid']}')
+                                                .update({
+                                              'cart.${widget.product['id']}${index + 1}':
                                               FieldValue.delete()
-                                        });
-                                        Navigator.pop(context);
-                                      }
-                                      setState(() {});
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
+                                            });
+                                            Navigator.pop(context);
+                                          }
+                                          setState(() {});
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
                                               BorderRadius.circular(4),
-                                          border:
+                                              border:
                                               Border.all(color: Colors.black)),
-                                      child: Icon(
-                                        Icons.remove,
-                                        color: Colors.blue,
-                                        size: 28,
+                                          child: Icon(
+                                            Icons.remove,
+                                            color: Colors.blue,
+                                            size: 28,
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 8,
-                                  ),
-                                  Text(
-                                    variants['${widget.product['id']}${index + 1}']
-                                            ['q']
-                                        .toString(),
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                  SizedBox(
-                                    width: 8,
-                                  ),
-                                  InkWell(
-                                    onTap: () async {
-                                      showLoadingDialog(
-                                          context, 'Updating Cart');
-                                      //CHANGED CART
-                                      /*await FirebaseFirestore.instance
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      Text(
+                                        variants['${widget.product['id']}${index + 1}']
+                                        ['q']
+                                            .toString(),
+                                        style: TextStyle(fontSize: 18),
+                                      ),
+                                      SizedBox(
+                                        width: 8,
+                                      ),
+                                      InkWell(
+                                        onTap: () async {
+                                          showLoadingDialog(
+                                              context, 'Updating Cart');
+                                          //CHANGED CART
+                                          /*await FirebaseFirestore.instance
                                           .collection('users')
                                           .doc(
                                               '${Storage.user['cid']}')
@@ -363,67 +379,67 @@ class _ProductState extends State<Product> {
                                                 ['q'] +
                                             1,
                                       });*/
-                                      await FirebaseFirestore.instance
-                                          .collection('users')
-                                          .doc('${Storage.user['cid']}')
-                                          .update({
-                                        'cart.${widget.product['id']}${index + 1}.q':
+                                          await FirebaseFirestore.instance
+                                              .collection('users')
+                                              .doc('${Storage.user['cid']}')
+                                              .update({
+                                            'cart.${widget.product['id']}${index + 1}.q':
                                             variants['${widget.product['id']}${index + 1}']
-                                                    ['q'] +
+                                            ['q'] +
                                                 1
-                                      });
-                                      Navigator.pop(context);
-                                      setState(() {});
-                                    },
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
+                                          });
+                                          Navigator.pop(context);
+                                          setState(() {});
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
                                               BorderRadius.circular(4),
-                                          border:
+                                              border:
                                               Border.all(color: Colors.black)),
-                                      child: Icon(
-                                        Icons.add,
-                                        color: Colors.blue,
-                                        size: 28,
+                                          child: Icon(
+                                            Icons.add,
+                                            color: Colors.blue,
+                                            size: 28,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            if (!widget.product['s'])
-                              Padding(
-                                padding:
+                                if (!widget.product['s'])
+                                  Padding(
+                                    padding:
                                     const EdgeInsets.symmetric(horizontal: 4),
-                                child: RaisedButton(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.only(
-                                            bottomLeft: Radius.circular(8),
-                                            bottomRight: Radius.circular(8))),
-                                    onPressed: () {},
-                                    child: Text('Out Of Stock')),
-                              )
-                          ],
-                        ),
-                      );
-                    }).toList(),
+                                    child: RaisedButton(
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.only(
+                                                bottomLeft: Radius.circular(8),
+                                                bottomRight: Radius.circular(8))),
+                                        onPressed: () {},
+                                        child: Text('Out Of Stock')),
+                                  )
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                      SizedBox(
+                        height: 16,
+                      ),
+                      Text(
+                        'Description :',
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                      Text(
+                        widget.product['d'] == ''
+                            ? '    No description'
+                            : '    ' + widget.product['d'],
+                        style: TextStyle(fontSize: 14, color: Colors.black),
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    height: 16,
-                  ),
-                  Text(
-                    'Description :',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
-                  ),
-                  Text(
-                    widget.product['d'] == ''
-                        ? '    No description'
-                        : '    ' + widget.product['d'],
-                    style: TextStyle(fontSize: 14, color: Colors.black),
-                  ),
-                ],
-              ),
-            ))
+                ))
           ],
         ),
       ),
