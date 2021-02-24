@@ -21,12 +21,14 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
+  localstorage: ^3.0.6
+  firebase_database:
   cached_network_image: ^2.5.0
   webview_flutter: ^0.3.22+1
-  firebase_messaging: ^7.0.0
-  cloud_firestore: ^0.14.0+2
-  firebase_auth: ^0.18.0+1
-  firebase_core: ^0.5.0
+  firebase_messaging:
+  cloud_firestore:
+  firebase_auth:
+  firebase_core:
   share: ^0.6.4+3
   flutter_google_places: ^0.2.5
   http: ^0.12.2

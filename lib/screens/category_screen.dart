@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../containers/focused_menu.dart';
 import '../containers/title_text.dart';
 import '../storage.dart';
@@ -52,7 +53,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         children: List.generate(visproducts.length, (index) {
                           return ProductCard(
                             hw: false,
-                            snap: visproducts[index].data(),
+                            snap: visproducts[index],
                           );
                         }),
                       );
@@ -64,7 +65,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         childAspectRatio: 0.68,
                         children: List.generate(visproducts.length, (index) {
                           return ProductCard(
-                            snap: visproducts[index].data(),
+                            snap: visproducts[index],
                             hw: false,
                           );
                         }),

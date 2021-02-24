@@ -1,13 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class Storage {
-  static List<DocumentSnapshot> products;
+  static List<dynamic> products;
   static Map<String, dynamic> productsMap = new Map<String, dynamic>();
   static Map<String, dynamic> cart;
-  static List<String> cart_products_id = [];
-  static List<String> cart_keys = [];
-  static List<String> categories = [];
+  static List<dynamic> cart_products_id = [];
+  static List<dynamic> cart_keys = [];
+  static List<dynamic> categories = [];
   static Map<String, dynamic> user;
   static Map<String, dynamic> shop_details;
   static String notif_token = '';

@@ -335,9 +335,8 @@ class _OrderState extends State<Order> {
                       onTap: () {
                         Navigator.of(context).push(createRoute(Product(
                           product: Storage
-                              .productsMap[order['prods'][i]['id']]
-                              .data(),
-                        )));
+                                    .productsMap[order['prods'][i]['id']],
+                              )));
                       },
                       child: Container(
                         padding: const EdgeInsets.all(4),

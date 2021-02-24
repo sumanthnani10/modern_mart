@@ -5,6 +5,7 @@ import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
+import 'package:localstorage/localstorage.dart';
 
 import '../screens/splash_screen.dart';
 import '../storage.dart';
@@ -28,6 +29,7 @@ class _UserDetailsInputState extends State<UserDetailsInput>
   final homeScaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController addressc = new TextEditingController();
   GoogleMapController map;
+  LocalStorage storage = new LocalStorage('Modern_Mart');
 
   LatLng custLoc, shopLoc;
   Position position;
@@ -75,7 +77,6 @@ class _UserDetailsInputState extends State<UserDetailsInput>
                     'cid': widget.uid,
                     'm': widget.phone,
                     'nt': '',
-                    'cart': {},
                     'd': distance,
                     'a': custAddress + ', near $landmark',
                     'ar': Storage.APP_NAME_ + '_' + Storage.APP_LOCATION,
@@ -84,6 +85,19 @@ class _UserDetailsInputState extends State<UserDetailsInput>
                     'fn': fname,
                     'ln': lname,
                   });
+                  await storage.setItem("user", {
+                    'cid': widget.uid,
+                    'm': widget.phone,
+                    'nt': '',
+                    'd': distance,
+                    'a': custAddress + ', near $landmark',
+                    'ar': Storage.APP_NAME_ + '_' + Storage.APP_LOCATION,
+                    'lt': custLoc.latitude,
+                    'lg': custLoc.longitude,
+                    'fn': fname,
+                    'ln': lname,
+                  });
+                  await storage.setItem("cart", <String, dynamic>{});
                   Navigator.of(context)
                       .pushReplacement(createRoute(SplashScreen()));
                 } else {
@@ -131,6 +145,7 @@ class _UserDetailsInputState extends State<UserDetailsInput>
                         Container(
                           width: 300,
                           child: TextField(
+                            textInputAction: TextInputAction.next,
                             onChanged: (v) {
                               fname = v;
                             },
@@ -157,6 +172,7 @@ class _UserDetailsInputState extends State<UserDetailsInput>
                         Container(
                           width: 300,
                           child: TextField(
+                            textInputAction: TextInputAction.next,
                             onChanged: (v) {
                               lname = v;
                             },
@@ -276,13 +292,13 @@ class _UserDetailsInputState extends State<UserDetailsInput>
                           padding: const EdgeInsets.symmetric(vertical: 8),
                           width: 330,
                           child: TextField(
+                            textInputAction: TextInputAction.next,
                             onChanged: (v) {
                               custAddress = v;
                             },
                             keyboardType: TextInputType.text,
                             controller: addressc,
                             textCapitalization: TextCapitalization.words,
-                            textInputAction: TextInputAction.done,
                             maxLines: 4,
                             decoration: InputDecoration(
                                 fillColor: Colors.white70,
@@ -298,6 +314,7 @@ class _UserDetailsInputState extends State<UserDetailsInput>
                         Container(
                           width: 330,
                           child: TextField(
+                            textInputAction: TextInputAction.done,
                             onChanged: (v) {
                               landmark = v;
                             },

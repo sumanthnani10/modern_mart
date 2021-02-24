@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import '../screens/splash_screen.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -103,6 +104,7 @@ class _OtpScreenState extends State<OtpScreen>
                           .then((value) async {
                         Navigator.popUntil(
                             context, (route) => route is PageRoute);
+
                         Navigator.push(context, createRoute(SplashScreen()));
                       }).catchError(() {
                         Navigator.pop(context);

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+
 import '../containers/focused_menu.dart';
 import '../storage.dart';
 
@@ -79,15 +80,14 @@ class _ProductsScreenState extends State<ProductsScreen>
                               ? LayoutBuilder(
                                   builder: (context, constraints) {
                                     visproducts = allproducts.where((e) {
-                                      if (e
-                                          .data()['n']
+                                      if (e['n']
                                           .toLowerCase()
                                           .contains(search)) {
                                         if (filterCats.length == 0) {
                                           return true;
                                         } else {
-                                          return filterCats.contains(Storage
-                                              .categories[e.data()['c']]);
+                                          return filterCats.contains(
+                                              Storage.categories[e['c']]);
                                         }
                                       } else {
                                         return false;
@@ -95,29 +95,25 @@ class _ProductsScreenState extends State<ProductsScreen>
                                     }).toList();
                                     switch (sort) {
                                       case 0:
-                                        visproducts.sort((a, b) => a
-                                            .data()['n']
-                                            .compareTo(b.data()['n']));
+                                        visproducts.sort(
+                                            (a, b) => a['n'].compareTo(b['n']));
                                         /*visproducts.sort((a, b) =>
-                                            Storage.categories.indexOf(a.data()['c']) -
-                                            Storage.categories.indexOf(b.data()['c']));*/
+                                            Storage.categories.indexOf(a['c']) -
+                                            Storage.categories.indexOf(b['c']));*/
                                         break;
                                       case 1:
-                                        visproducts.sort((a, b) => a
-                                            .data()['n']
-                                            .compareTo(b.data()['n']));
+                                        visproducts.sort(
+                                            (a, b) => a['n'].compareTo(b['n']));
                                         break;
                                       case 2:
-                                        visproducts.sort((a, b) => b
-                                            .data()['n']
-                                            .compareTo(a.data()['n']));
+                                        visproducts.sort(
+                                            (a, b) => b['n'].compareTo(a['n']));
                                         break;
                                       case 3:
                                         visproducts.sort((a, b) {
-                                          if (b
-                                              .data()['o']
+                                          if (b['o']
                                               .toDate()
-                                              .isBefore(a.data()['o'].toDate()))
+                                              .isBefore(a['o'].toDate()))
                                             return -1;
                                           else
                                             return 1;
@@ -125,10 +121,9 @@ class _ProductsScreenState extends State<ProductsScreen>
                                         break;
                                       case 4:
                                         visproducts.sort((a, b) {
-                                          if (a
-                                              .data()['o']
+                                          if (a['o']
                                               .toDate()
-                                              .isBefore(b.data()['o'].toDate()))
+                                              .isBefore(b['o'].toDate()))
                                             return -1;
                                           else
                                             return 1;
@@ -136,13 +131,11 @@ class _ProductsScreenState extends State<ProductsScreen>
                                         break;
                                       case 5:
                                         visproducts.sort((a, b) {
-                                          // print(((((a.data()['m1'] - a.data()['dp1']) / a.data()['m1']) - ((b.data()['m1'] - b.data()['dp1']) / b.data()['m1'])) * 100).toInt());
-                                          return ((((a.data()['m1'] -
-                                                              a.data()['dp1']) /
-                                                          a.data()['m1']) -
-                                                      ((b.data()['m1'] -
-                                                              b.data()['dp1']) /
-                                                          b.data()['m1'])) *
+                                          // print(((((a['m1'] - a['dp1']) / a['m1']) - ((b['m1'] - b['dp1']) / b['m1'])) * 100).toInt());
+                                          return ((((a['m1'] - a['dp1']) /
+                                                          a['m1']) -
+                                                      ((b['m1'] - b['dp1']) /
+                                                          b['m1'])) *
                                                   100)
                                               .toInt();
                                         });
@@ -161,8 +154,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                                                   (index) {
                                                 return ProductCard(
                                                   hw: false,
-                                                  snap:
-                                                      visproducts[index].data(),
+                                                  snap: visproducts[index],
                                                 );
                                               }) +
                                               [
@@ -191,8 +183,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                                                       visproducts.length),
                                                   (index) {
                                                 return ProductCard(
-                                                  snap:
-                                                      visproducts[index].data(),
+                                                  snap: visproducts[index],
                                                   hw: false,
                                                 );
                                               }) +
@@ -749,7 +740,7 @@ class _ProductsScreenState extends State<ProductsScreen>
                               children: List<Widget>.generate(
                                       t.length < 5 ? t.length : 5, (index) {
                                     return ProductCard(
-                                      snap: t[index].data(),
+                                      snap: t[index],
                                       hw: true,
                                     );
                                   }).toList() +

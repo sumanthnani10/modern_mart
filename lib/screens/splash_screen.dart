@@ -2,7 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:localstorage/localstorage.dart';
 
 import '../screens/bottom_nav.dart';
 import '../screens/login.dart';
@@ -20,6 +22,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool gotDetails = false;
+  LocalStorage storage = new LocalStorage('Modern_Mart');
 
   @override
   void initState() {
@@ -29,59 +32,130 @@ class _SplashScreenState extends State<SplashScreen> {
 
   getProducts() async {
     await Firebase.initializeApp();
+    await storage.ready;
     if (FirebaseAuth.instance.currentUser != null) {
       String uid;
       String phone;
       User value = FirebaseAuth.instance.currentUser;
       uid = value.uid;
       phone = value.phoneNumber;
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .get()
-          .then((val) async {
-        if (val.data() == null) {
-          Navigator.pushReplacement(
-              context, createRoute(UserDetailsInput(uid, phone)));
-        } else {
-          Storage.user = val.data();
-          Storage.cart = val.data()['cart'];
-          Storage.cart_products_id.length = 0;
-          Storage.cart.forEach((_, element) {
-            Storage.cart_products_id.add(element['id']);
-          });
-          Storage.cart_keys = Storage.cart.keys.toList();
+      var user = await storage.getItem("user");
+      if (user == null) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .get()
+            .then((val) async {
+          if (val.data() == null) {
+            Navigator.pushReplacement(
+                context, createRoute(UserDetailsInput(uid, phone)));
+          } else {
+            user = val.data();
+            await storage.setItem("user", user);
+            await storage.setItem("cart", <String, dynamic>{});
+          }
+        });
+      } else if (user["cid"] != uid) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .get()
+            .then((val) async {
+          if (val.data() == null) {
+            Navigator.pushReplacement(
+                context, createRoute(UserDetailsInput(uid, phone)));
+          } else {
+            user = val.data();
+            await storage.setItem("user", user);
+            await storage.setItem("cart", <String, dynamic>{});
+          }
+        });
+      } else {
+        Storage.user = user;
+        Storage.cart = await storage.getItem("cart") ?? <String, dynamic>{};
+        Storage.cart_products_id.length = 0;
+        Storage.cart.forEach((_, element) {
+          Storage.cart_products_id.add(element['id']);
+        });
+        Storage.cart_keys = Storage.cart.keys.toList();
+
+        int curr = DateTime.now().millisecondsSinceEpoch;
+        var last = await FirebaseDatabase.instance
+            .reference()
+            .child('last_edit_products')
+            .once();
+        // print(last.value);
+        int last_edit_products = last.value ?? curr;
+        // print(last_edit_products);
+        last = await FirebaseDatabase.instance
+            .reference()
+            .child('last_edit_shop')
+            .once();
+        // print(last.value);
+        int last_edit_shop = last.value ?? curr;
+
+        var lastRead = await storage.getItem("last_read_shop") ?? {"value": 0};
+
+        // print(lastRead);
+        // print(lastRead['value']);
+
+        if (last_edit_shop > lastRead["value"] ?? 0) {
+          // print(1);
           await FirebaseFirestore.instance
               .collection('shop')
               .doc(Storage.APP_NAME_ + '_' + Storage.APP_LOCATION)
               .get()
-              .then((value) {
+              .then((value) async {
             Storage.shop_details = value.data();
             Storage.categories = [];
             value.data()['categories'].forEach((e) {
               Storage.categories.add(e.toString());
             });
+            await storage.setItem("shop", Storage.shop_details);
+            await storage.setItem("categories", {"cats": Storage.categories});
+            await storage.setItem("last_read_shop",
+                {"value": DateTime.now().millisecondsSinceEpoch});
           });
+        } else {
+          // print(2);
+          Storage.shop_details = await storage.getItem("shop");
+          var r = await storage.getItem("categories") ?? {"cats": []};
+          Storage.categories = r['cats'];
+        }
+
+        lastRead = await storage.getItem("last_read_products") ?? {"value": 0};
+
+        // print(lastRead);
+        // print(lastRead['value']);
+
+        if (last_edit_products > lastRead["value"] ?? 0) {
+          // print(1);
           await FirebaseFirestore.instance
               .collection('shop')
-              .doc(val.data()['ar'].toString())
+              .doc(user['ar'].toString())
               .collection('prods')
               .orderBy('n')
               .get()
-              .then((value) {
-            Storage.products = value.docs;
+              .then((value) async {
             Storage.productsMap.clear();
-            Storage.products.forEach((element) {
+            value.docs.forEach((element) {
               Storage.productsMap[element.id] = element.data();
+              Storage.productsMap[element.id]['o'] =
+                  Storage.productsMap[element.id]['o'].millisecondsSinceEpoch;
+              Storage.products.add(Storage.productsMap[element.id]);
             });
-            /*Storage.products.sort((a, b) {
-              return categories.indexOf(a.data()['c']) -
-                  categories.indexOf(b.data()['c']);
-            });*/
+            await storage.setItem("products", Storage.productsMap);
+            await storage.setItem("last_read_products",
+                {"value": DateTime.now().millisecondsSinceEpoch});
           });
-          Navigator.of(context).pushReplacement(createRoute(BottomNavBar()));
+        } else {
+          // print(2);
+          Storage.productsMap = await storage.getItem("products");
+          // print(Storage.productsMap);
+          Storage.products = Storage.productsMap.values.toList();
         }
-      });
+        Navigator.of(context).pushReplacement(createRoute(BottomNavBar()));
+      }
     } else {
       Navigator.of(context).pushReplacement(createRoute(Login()));
     }

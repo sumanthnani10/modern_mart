@@ -14,7 +14,7 @@ class CategoriesScreen extends StatefulWidget {
 class _CategoriesScreenState extends State<CategoriesScreen>
     with AutomaticKeepAliveClientMixin {
   List<dynamic> t;
-  List<String> categories = ['New Arrival'] + Storage.categories;
+  List<dynamic> categories = Storage.categories;
 
   @override
   void initState() {
@@ -89,18 +89,15 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                         if (categories[i] == categories[0]) {
                           t = Storage.products.toList();
                           t.sort((a, b) {
-                            if (b
-                                .data()['o']
-                                .toDate()
-                                .isBefore(a.data()['o'].toDate()))
+                            if (b['o'] > a['o'])
                               return -1;
                             else
                               return 1;
                           });
               } else {
                 t = List.from(Storage.products.where((element) {
-                  return element.data()['c'] == i - 1;
-                }));
+                  return element['c'] == i - 1;
+                          }));
               }
               if (t.length == 0) {
                 return Container();
@@ -129,8 +126,8 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                         products: List.from(Storage
                                             .products
                                             .where((element) {
-                                          return element.data()['c'] == i - 1;
-                                        })))));
+                                          return element['c'] == i - 1;
+                                          })))));
                               },
                               child: Text(
                                 'More',
@@ -150,9 +147,9 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                         children: List<Widget>.generate(
                             t.length < 5 ? t.length : 5, (index) {
                           return ProductCard(
-                            snap: t[index].data(),
-                            hw: true,
-                          );
+                            snap: t[index],
+                                          hw: true,
+                                        );
                         }).toList() +
                             [
                               if (categories[i] != categories[0])
@@ -163,8 +160,8 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                             categories[i], products:
                                         List.from(Storage.products
                                             .where((element) {
-                                          return element.data()['c'] == i - 1;
-                                        })))));
+                                          return element['c'] == i - 1;
+                                              })))));
                                   },
                                   child: Container(
                                     width: 160,
