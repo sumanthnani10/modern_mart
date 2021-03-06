@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
@@ -16,20 +18,39 @@ class _CategoriesScreenState extends State<CategoriesScreen>
   List<dynamic> t;
   List<dynamic> categories = Storage.categories;
 
+  ScrollController scrollController = new ScrollController();
+  int viewItems = 4;
+
   @override
   void initState() {
+    scrollController.addListener(() {
+      if (scrollController.offset >=
+              scrollController.position.maxScrollExtent &&
+          !scrollController.position.outOfRange) {
+        viewItems += 4;
+        // print(viewItems);
+        setState(() {});
+      }
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    t = Storage.products.toList();
+    t.sort((a, b) {
+      if (b['o'] > a['o'])
+        return -1;
+      else
+        return 1;
+    });
     return Container(
       color: Storage.APP_COLOR,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 4, 0, 0),
         child: Storage.cart == null
             ? Column(
-          children: <Widget>[
+                children: <Widget>[
                   LinearProgressIndicator(),
                   Container(
                     constraints: BoxConstraints(maxWidth: 360),
@@ -41,20 +62,21 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                         autoplay: false,
                         defaultImage: Image.asset('assets/logo/logo.jpg'),
                         images: [],
-                      ),
-                    ),
-                  ),
-                ],
+                ),
+              ),
+            ),
+          ],
         )
             : SingleChildScrollView(
-          physics: BouncingScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+                physics: BouncingScrollPhysics(),
+                controller: scrollController,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                         ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: Container(
-                            constraints: BoxConstraints(maxWidth: 360),
+                            width: MediaQuery.of(context).size.width,
                             color: Colors.white,
                             child: AspectRatio(
                               aspectRatio: 4 / 2,
@@ -66,14 +88,14 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                                 images: List.generate(
                                     Storage.shop_details['sliders'].length,
                                     (index) => CachedNetworkImage(
-                                          progressIndicatorBuilder:
-                                              (context, url, progress) =>
-                                                  CircularProgressIndicator(
-                                            value: progress.progress,
-                                          ),
-                                          errorWidget: (context, url, error) =>
-                                              Center(child: Text('Image')),
-                                          useOldImageOnUrlChange: true,
+                            progressIndicatorBuilder:
+                                (context, url, progress) =>
+                                CircularProgressIndicator(
+                                  value: progress.progress,
+                                ),
+                            errorWidget: (context, url, error) =>
+                                Center(child: Text('Image')),
+                            useOldImageOnUrlChange: true,
                                           imageUrl:
                                               'https://firebasestorage.googleapis.com/v0/b/modern-mart.appspot.com/o/Sliders%2Fimage1?alt=media&token=' +
                                                   Storage.shop_details[
@@ -84,123 +106,158 @@ class _CategoriesScreenState extends State<CategoriesScreen>
                             ),
                           ),
                         ),
-                      ] +
-                      List<Widget>.generate(categories.length, (i) {
-                        if (categories[i] == categories[0]) {
-                          t = Storage.products.toList();
-                          t.sort((a, b) {
-                            if (b['o'] > a['o'])
-                              return -1;
-                            else
-                              return 1;
-                          });
-              } else {
-                t = List.from(Storage.products.where((element) {
-                  return element['c'] == i - 1;
-                          }));
-              }
-              if (t.length == 0) {
-                return Container();
-              } else {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text(
-                            categories[i],
-                            style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600),
-                          ),
-                          if (categories[i] != categories[0])
-                            InkWell(
-                              onTap: () {
-                                Navigator.of(context).push(createRoute(
-                                    CategoryScreen(categories[i],
-                                        products: List.from(Storage
-                                            .products
-                                            .where((element) {
-                                          return element['c'] == i - 1;
-                                          })))));
-                              },
-                              child: Text(
-                                'More',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.indigo,
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                    SingleChildScrollView(
-                      physics: BouncingScrollPhysics(),
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        children: List<Widget>.generate(
-                            t.length < 5 ? t.length : 5, (index) {
-                          return ProductCard(
-                            snap: t[index],
-                                          hw: true,
-                                        );
-                        }).toList() +
-                            [
-                              if (categories[i] != categories[0])
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                        createRoute(CategoryScreen(
-                                            categories[i], products:
-                                        List.from(Storage.products
-                                            .where((element) {
-                                          return element['c'] == i - 1;
-                                              })))));
-                                  },
-                                  child: Container(
-                                    width: 160,
-                                    height: 236,
-                                    child: Card(
-                                      elevation: 4,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                        BorderRadius.circular(8),
-                                      ),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                        children: <Widget>[
-                                          Text(
-                                            'More',
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                color: Colors.indigo),
-                                          )
-                                        ],
-                                      ),
+                        t.length > 0
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: <Widget>[
+                                        Text(
+                                          "New Arrival",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                )
+                                  SingleChildScrollView(
+                                    physics: BouncingScrollPhysics(),
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                        children: List<Widget>.generate(
+                                            t.length < 5 ? t.length : 5,
+                                            (index) {
+                                      return ProductCard(
+                                        snap: t[index],
+                                        hw: true,
+                                      );
+                                    }).toList()),
+                                  ),
+                                  SizedBox(
+                                    height: 4,
+                                  )
+                                ],
+                              )
+                            : Container()
+                      ] +
+                      List<Widget>.generate(
+                          min<int>(viewItems, categories.length), (i) {
+                        t = List.from(Storage.products.where((element) {
+                          return element['c'] == i;
+                        }));
+                        if (t.length == 0) {
+                          return Container();
+                        } else {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text(
+                                      categories[i],
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.of(context).push(createRoute(
+                                            CategoryScreen(categories[i],
+                                                products: List.from(Storage
+                                                    .products
+                                                    .where((element) {
+                                          return element['c'] == i;
+                                        })))));
+                                      },
+                                      child: Text(
+                                        'More',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.indigo,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SingleChildScrollView(
+                                physics: BouncingScrollPhysics(),
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: List<Widget>.generate(
+                                          t.length < 5 ? t.length : 5, (index) {
+                                        return ProductCard(
+                                          snap: t[index],
+                                          hw: true,
+                                        );
+                                      }).toList() +
+                                      [
+                                        InkWell(
+                                          onTap: () {
+                                            Navigator.of(context).push(
+                                                createRoute(CategoryScreen(
+                                                    categories[i], products:
+                                                        List.from(Storage
+                                                            .products
+                                                            .where((element) {
+                                              return element['c'] == i;
+                                            })))));
+                                          },
+                                          child: Container(
+                                            width: 160,
+                                            height: 236,
+                                            child: Card(
+                                              elevation: 4,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Text(
+                                                    'More',
+                                                    style: TextStyle(
+                                                        fontSize: 20,
+                                                        color: Colors.indigo),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                ),
+                              ),
+                              SizedBox(
+                                height: 4,
+                              )
                             ],
-                      ),
-                    ),
-                    SizedBox(
-                      height: 4,
-                    )
-                  ],
-                );
-              }
-            }).toList(),
-          ),
-        ),
+                          );
+                        }
+                      }) +
+                      [
+                        Text(
+                            "${viewItems < categories.length ? "Loading..." : ""}")
+                      ],
+                ),
+              ),
       ),
     );
   }
@@ -215,7 +272,7 @@ class _CategoriesScreenState extends State<CategoriesScreen>
         var curve = Curves.fastOutSlowIn;
 
         var tween =
-        Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
         return SlideTransition(
           position: animation.drive(tween),

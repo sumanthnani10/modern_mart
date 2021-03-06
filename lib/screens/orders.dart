@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
 import '../containers/order_container.dart';
 import '../screens/order.dart';
 import '../storage.dart';
@@ -36,25 +37,34 @@ class _OrdersState extends State<Orders> {
   }
 
   getOrders() async {
-    await FirebaseFirestore.instance
-        .collection('orders')
-        .where('det.cid', isEqualTo: Storage.user['cid'])
-        .get()
-        .then((value) {
-      orders = value.docs;
-      orders.sort((a, b) {
-        if (b
-            .data()['time']['pla']
-            .toDate()
-            .isBefore(a.data()['time']['pla'].toDate()))
-          return -1;
-        else
-          return 1;
+    try {
+      await FirebaseFirestore.instance
+          .collection('orders')
+          .where('det.cid', isEqualTo: Storage.user['cid'])
+          .get()
+          .then((value) {
+        orders = value.docs;
+        // print(orders.length);
+        orders.sort((a, b) {
+          if (b
+              .data()['time']['pla']
+              .toDate()
+              .isBefore(a.data()['time']['pla'].toDate()))
+            return -1;
+          else
+            return 1;
+        });
       });
-    });
-    setState(() {
-      gotOrders = true;
-    });
+      setState(() {
+        gotOrders = true;
+      });
+    } catch (e) {
+      orders = [];
+      setState(() {
+        gotOrders = true;
+      });
+    }
+    ;
   }
 
   @override
@@ -221,7 +231,7 @@ class _OrdersState extends State<Orders> {
               if (orders != null && orders.length == 0) Text('No Orders'),
               if (orders != null && orders.length != 0)
                 ListView.builder(
-                    itemCount: 1,
+                    itemCount: orders.length,
                     physics: BouncingScrollPhysics(),
                     shrinkWrap: true,
                     padding: const EdgeInsets.all(0),
@@ -254,7 +264,7 @@ class _OrdersState extends State<Orders> {
                       return OrderContainer(
                         onTap: () {
                           Navigator.of(context).push(createRoute(Order(
-                            snap,
+                            orderdet: snap,
                           )));
                         },
                         time: snap['time']['pla'],

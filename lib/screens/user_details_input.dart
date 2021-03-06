@@ -29,7 +29,7 @@ class _UserDetailsInputState extends State<UserDetailsInput>
   final homeScaffoldKey = GlobalKey<ScaffoldState>();
   TextEditingController addressc = new TextEditingController();
   GoogleMapController map;
-  LocalStorage storage = new LocalStorage('Modern_Mart');
+  LocalStorage storage = new LocalStorage('${Storage.localStorageKey}');
 
   LatLng custLoc, shopLoc;
   Position position;

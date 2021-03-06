@@ -115,8 +115,10 @@ class _ProfileState extends State<Profile> {
                   ),
                 ),
                 InkWell(
-                  onTap: () {
+                  onTap: () async {
                     FirebaseAuth.instance.signOut();
+                    await Storage.writeLocal("user", {});
+                    await Storage.writeLocal("cart", <String, dynamic>{});
                     Navigator.pushReplacement(context, createRoute(Login()));
                   },
                   child: Container(

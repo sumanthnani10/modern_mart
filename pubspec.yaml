@@ -21,7 +21,7 @@ environment:
   sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
-  localstorage: ^3.0.6
+  localstorage:
   firebase_database:
   cached_network_image: ^2.5.0
   webview_flutter: ^0.3.22+1
@@ -30,12 +30,12 @@ dependencies:
   firebase_auth:
   firebase_core:
   share: ^0.6.4+3
-  flutter_google_places: ^0.2.5
+  flutter_google_places: ^0.2.8
   http: ^0.12.2
   overlay_support: ^1.0.5
-  android_intent: ^0.3.7+2
-  geolocator: ^5.3.2+2
-  google_maps_flutter: ^0.5.28+1
+  geolocator:
+  android_intent:
+  google_maps_flutter: ^2.0.1
   url_launcher: ^5.5.0
   font_awesome_flutter: ^8.8.1
   carousel_pro: ^1.0.0

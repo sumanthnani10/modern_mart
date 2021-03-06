@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/product_view_screen.dart';
@@ -93,9 +92,12 @@ class _ProductCardState extends State<ProductCard>
             child: AspectRatio(
               aspectRatio: 3 / 2,
               child: CachedNetworkImage(
-                progressIndicatorBuilder: (context, url, progress) =>
-                    CircularProgressIndicator(
-                  value: progress.progress,
+                progressIndicatorBuilder: (context, url, progress) => SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CircularProgressIndicator(
+                    value: progress.progress,
+                  ),
                 ),
                 errorWidget: (context, url, error) =>
                     Center(child: Text('Image')),
@@ -232,7 +234,7 @@ class _ProductCardState extends State<ProductCard>
                         'pn': 1,
                         'q': 1,
                       });*/
-                      await FirebaseFirestore.instance
+                      /*await FirebaseFirestore.instance
                           .collection('users')
                           .doc('${Storage.user['cid']}')
                           .update({
@@ -241,7 +243,15 @@ class _ProductCardState extends State<ProductCard>
                           'pn': 1,
                           'q': 1,
                         }
-                      });
+                      });*/
+                      Storage.cart['${widget.snap['id']}1'] = {
+                        'id': widget.snap['id'],
+                        'pn': 1,
+                        'q': 1,
+                      };
+                      Storage.cart_products_id.add('${widget.snap['id']}');
+                      Storage.cart_keys.add('${widget.snap['id']}1');
+                      await Storage.writeLocal("cart", Storage.cart);
                       Navigator.pop(context);
                       setState(() {});
                     }
@@ -325,14 +335,21 @@ class _ProductCardState extends State<ProductCard>
                                       ['q'] -
                                   1,
                         });*/
-                        await FirebaseFirestore.instance
+                        /*await FirebaseFirestore.instance
                             .collection('users')
                             .doc('${Storage.user['cid']}')
                             .update({
                           'cart.${widget.snap['id']}1.q':
                               variants['${widget.snap['id']}1']['q'] - 1,
-                        });
+                        });*/
+                        Storage.cart['${widget.snap['id']}1'] = {
+                          'id': widget.snap['id'],
+                          'pn': 1,
+                          'q': variants['${widget.snap['id']}1']['q'] - 1,
+                        };
+                        await Storage.writeLocal("cart", Storage.cart);
                         Navigator.pop(context);
+
                       } else {
                         showLoadingDialog(context, 'Removing from Cart');
                         //CHANGED CART
@@ -342,12 +359,16 @@ class _ProductCardState extends State<ProductCard>
                             .collection('cart')
                             .doc('${widget.snap['id']}1')
                             .delete();*/
-                        await FirebaseFirestore.instance
+                        /*await FirebaseFirestore.instance
                             .collection('users')
                             .doc('${Storage.user['cid']}')
                             .update({
                           'cart.${widget.snap['id']}1': FieldValue.delete(),
-                        });
+                        });*/
+                        Storage.cart.remove('${widget.snap['id']}1');
+                        Storage.cart_products_id.remove('${widget.snap['id']}');
+                        Storage.cart_keys.remove('${widget.snap['id']}1');
+                        await Storage.writeLocal("cart", Storage.cart);
                         Navigator.pop(context);
                       }
                       setState(() {});
@@ -383,13 +404,19 @@ class _ProductCardState extends State<ProductCard>
                                     ['q'] +
                                 1,
                       });*/
-                      await FirebaseFirestore.instance
+                      /*await FirebaseFirestore.instance
                           .collection('users')
                           .doc('${Storage.user['cid']}')
                           .update({
                         'cart.${widget.snap['id']}1.q':
                             variants['${widget.snap['id']}1']['q'] + 1,
-                      });
+                      });*/
+                      Storage.cart['${widget.snap['id']}1'] = {
+                        'id': widget.snap['id'],
+                        'pn': 1,
+                        'q': variants['${widget.snap['id']}1']['q'] + 1,
+                      };
+                      await Storage.writeLocal("cart", Storage.cart);
                       Navigator.pop(context);
                       setState(() {});
                     },
@@ -456,7 +483,7 @@ class _ProductCardState extends State<ProductCard>
 
   @override
   Widget build(BuildContext context) {
-    var t;
+    // var t;
     for (int index = 0; index < widget.snap['p']; index++) {
       //CHANGED CART
       /*if ((t = Storage.cart.singleWhere((element) {
@@ -576,7 +603,7 @@ class _FocusedMenuDetailsState extends State<FocusedMenuDetails> {
 
   @override
   Widget build(BuildContext context) {
-    var t;
+    // var t;
     for (int index = 0; index < widget.snap['p']; index++) {
       //CHANGED CART
       /*if ((t = Storage.cart.singleWhere((element) {
@@ -664,7 +691,7 @@ class _FocusedMenuDetailsState extends State<FocusedMenuDetails> {
                       'pn': index + 1,
                       'q': 1,
                     });*/
-                    await FirebaseFirestore.instance
+                    /*await FirebaseFirestore.instance
                         .collection('users')
                         .doc('${Storage.user['cid']}')
                         .update({
@@ -673,7 +700,15 @@ class _FocusedMenuDetailsState extends State<FocusedMenuDetails> {
                         'pn': index + 1,
                         'q': 1,
                       }
-                    });
+                    });*/
+                    Storage.cart['${widget.snap['id']}${index + 1}'] = {
+                      'id': widget.snap['id'],
+                      'pn': index + 1,
+                      'q': 1,
+                    };
+                    Storage.cart_products_id.add('${widget.snap['id']}');
+                    Storage.cart_keys.add('${widget.snap['id']}${index + 1}');
+                    await Storage.writeLocal("cart", Storage.cart);
                     Navigator.pop(context);
                     setState(() {});
                   },
@@ -707,7 +742,7 @@ class _FocusedMenuDetailsState extends State<FocusedMenuDetails> {
                                   ['q'] -
                               1,
                         });*/
-                        await FirebaseFirestore.instance
+                        /*await FirebaseFirestore.instance
                             .collection('users')
                             .doc('${Storage.user['cid']}')
                             .update({
@@ -715,26 +750,37 @@ class _FocusedMenuDetailsState extends State<FocusedMenuDetails> {
                               variants['${widget.snap['id']}${index + 1}']
                                       ['q'] -
                                   1
-                        });
-                        Navigator.pop(context);
+                        });*/
+                        Storage.cart['${widget.snap['id']}${index + 1}'] = {
+                          'id': widget.snap['id'],
+                          'pn': index + 1,
+                          'q': variants['${widget.snap['id']}${index +
+                              1}']['q'] - 1,
+                        };
+                        await Storage.writeLocal("cart", Storage.cart);
                       } else {
                         showLoadingDialog(context, 'Removing from Cart');
                         //CHANGED CART
-                      }
-                      /*await FirebaseFirestore.instance
+                        /*await FirebaseFirestore.instance
                             .collection('users')
                             .doc('${Storage.user['cid']}')
                             .collection('cart')
                             .doc(
                                 '${widget.snap['id']}${index + 1}')
                             .delete();*/
-                      await FirebaseFirestore.instance
+                        /*await FirebaseFirestore.instance
                           .collection('users')
                           .doc('${Storage.user['cid']}')
                           .update({
                         'cart.${widget.snap['id']}${index + 1}':
                             FieldValue.delete()
-                      });
+                      });*/
+                        Storage.cart.remove('${widget.snap['id']}${index + 1}');
+                        Storage.cart_products_id.remove('${widget.snap['id']}');
+                        Storage.cart_keys.remove('${widget.snap['id']}${index +
+                            1}');
+                        await Storage.writeLocal("cart", Storage.cart);
+                      }
                       Navigator.pop(context);
                       setState(() {});
                     },
@@ -777,14 +823,21 @@ class _FocusedMenuDetailsState extends State<FocusedMenuDetails> {
                                 ['q'] +
                             1,
                       });*/
-                      await FirebaseFirestore.instance
+                      /*await FirebaseFirestore.instance
                           .collection('users')
                           .doc('${Storage.user['cid']}')
                           .update({
                         'cart.${widget.snap['id']}${index + 1}.q':
                             variants['${widget.snap['id']}${index + 1}']['q'] +
                                 1
-                      });
+                      });*/
+                      Storage.cart['${widget.snap['id']}${index + 1}'] = {
+                        'id': widget.snap['id'],
+                        'pn': index + 1,
+                        'q': variants['${widget.snap['id']}${index + 1}']['q'] +
+                            1,
+                      };
+                      await Storage.writeLocal("cart", Storage.cart);
                       Navigator.pop(context);
                       setState(() {});
                     },

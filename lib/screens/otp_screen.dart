@@ -134,6 +134,7 @@ class _OtpScreenState extends State<OtpScreen>
     final PhoneVerificationCompleted verified = (AuthCredential ac) {
       showLoadingDialog(context, 'Signing In');
       FirebaseAuth.instance.signInWithCredential(ac).then((value) async {
+        // print("login success");
         Navigator.pushReplacement(context, createRoute(SplashScreen()));
       }).catchError(() {
         showAlertDialog(

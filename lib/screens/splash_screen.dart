@@ -22,7 +22,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   bool gotDetails = false;
-  LocalStorage storage = new LocalStorage('Modern_Mart');
+  LocalStorage storage = new LocalStorage('${Storage.localStorageKey}');
 
   @override
   void initState() {
@@ -70,92 +70,91 @@ class _SplashScreenState extends State<SplashScreen> {
             await storage.setItem("cart", <String, dynamic>{});
           }
         });
-      } else {
-        Storage.user = user;
-        Storage.cart = await storage.getItem("cart") ?? <String, dynamic>{};
-        Storage.cart_products_id.length = 0;
-        Storage.cart.forEach((_, element) {
-          Storage.cart_products_id.add(element['id']);
-        });
-        Storage.cart_keys = Storage.cart.keys.toList();
-
-        int curr = DateTime.now().millisecondsSinceEpoch;
-        var last = await FirebaseDatabase.instance
-            .reference()
-            .child('last_edit_products')
-            .once();
-        // print(last.value);
-        int last_edit_products = last.value ?? curr;
-        // print(last_edit_products);
-        last = await FirebaseDatabase.instance
-            .reference()
-            .child('last_edit_shop')
-            .once();
-        // print(last.value);
-        int last_edit_shop = last.value ?? curr;
-
-        var lastRead = await storage.getItem("last_read_shop") ?? {"value": 0};
-
-        // print(lastRead);
-        // print(lastRead['value']);
-
-        if (last_edit_shop > lastRead["value"] ?? 0) {
-          // print(1);
-          await FirebaseFirestore.instance
-              .collection('shop')
-              .doc(Storage.APP_NAME_ + '_' + Storage.APP_LOCATION)
-              .get()
-              .then((value) async {
-            Storage.shop_details = value.data();
-            Storage.categories = [];
-            value.data()['categories'].forEach((e) {
-              Storage.categories.add(e.toString());
-            });
-            await storage.setItem("shop", Storage.shop_details);
-            await storage.setItem("categories", {"cats": Storage.categories});
-            await storage.setItem("last_read_shop",
-                {"value": DateTime.now().millisecondsSinceEpoch});
-          });
-        } else {
-          // print(2);
-          Storage.shop_details = await storage.getItem("shop");
-          var r = await storage.getItem("categories") ?? {"cats": []};
-          Storage.categories = r['cats'];
-        }
-
-        lastRead = await storage.getItem("last_read_products") ?? {"value": 0};
-
-        // print(lastRead);
-        // print(lastRead['value']);
-
-        if (last_edit_products > lastRead["value"] ?? 0) {
-          // print(1);
-          await FirebaseFirestore.instance
-              .collection('shop')
-              .doc(user['ar'].toString())
-              .collection('prods')
-              .orderBy('n')
-              .get()
-              .then((value) async {
-            Storage.productsMap.clear();
-            value.docs.forEach((element) {
-              Storage.productsMap[element.id] = element.data();
-              Storage.productsMap[element.id]['o'] =
-                  Storage.productsMap[element.id]['o'].millisecondsSinceEpoch;
-              Storage.products.add(Storage.productsMap[element.id]);
-            });
-            await storage.setItem("products", Storage.productsMap);
-            await storage.setItem("last_read_products",
-                {"value": DateTime.now().millisecondsSinceEpoch});
-          });
-        } else {
-          // print(2);
-          Storage.productsMap = await storage.getItem("products");
-          // print(Storage.productsMap);
-          Storage.products = Storage.productsMap.values.toList();
-        }
-        Navigator.of(context).pushReplacement(createRoute(BottomNavBar()));
       }
+      Storage.user = user;
+      Storage.cart = await storage.getItem("cart") ?? <String, dynamic>{};
+      Storage.cart_products_id.length = 0;
+      Storage.cart.forEach((_, element) {
+        Storage.cart_products_id.add(element['id']);
+      });
+      Storage.cart_keys = Storage.cart.keys.toList();
+
+      int curr = DateTime.now().millisecondsSinceEpoch;
+      var last = await FirebaseDatabase.instance
+          .reference()
+          .child('last_edit_products')
+          .once();
+      // print(last.value);
+      int last_edit_products = last.value ?? curr;
+      // print(last_edit_products);
+      last = await FirebaseDatabase.instance
+          .reference()
+          .child('last_edit_shop')
+          .once();
+      // print(last.value);
+      int last_edit_shop = last.value ?? curr;
+
+      var lastRead = await storage.getItem("last_read_shop") ?? {"value": 0};
+
+      // print(lastRead);
+      // print(lastRead['value']);
+
+      if (last_edit_shop > lastRead["value"] ?? 0) {
+        // print(1);
+        await FirebaseFirestore.instance
+            .collection('shop')
+            .doc(Storage.APP_NAME_ + '_' + Storage.APP_LOCATION)
+            .get()
+            .then((value) async {
+          Storage.shop_details = value.data();
+          Storage.categories = [];
+          value.data()['categories'].forEach((e) {
+            Storage.categories.add(e.toString());
+          });
+          await storage.setItem("shop", Storage.shop_details);
+          await storage.setItem("categories", {"cats": Storage.categories});
+          await storage.setItem("last_read_shop",
+              {"value": DateTime.now().millisecondsSinceEpoch});
+        });
+      } else {
+        // print(2);
+        Storage.shop_details = await storage.getItem("shop");
+        var r = await storage.getItem("categories") ?? {"cats": []};
+        Storage.categories = r['cats'];
+      }
+
+      lastRead = await storage.getItem("last_read_products") ?? {"value": 0};
+
+      // print(lastRead);
+      // print(lastRead['value']);
+
+      if (last_edit_products > lastRead["value"] ?? 0) {
+        // print(1);
+        await FirebaseFirestore.instance
+            .collection('shop')
+            .doc(user['ar'].toString())
+            .collection('prods')
+            .orderBy('n')
+            .get()
+            .then((value) async {
+          Storage.productsMap = {};
+          value.docs.forEach((element) {
+            Storage.productsMap[element.id] = element.data();
+            Storage.productsMap[element.id]['o'] =
+                Storage.productsMap[element.id]['o'].millisecondsSinceEpoch;
+            Storage.products.add(Storage.productsMap[element.id]);
+          });
+          await storage.setItem("products", Storage.productsMap);
+          await storage.setItem("last_read_products",
+              {"value": DateTime.now().millisecondsSinceEpoch});
+        });
+      } else {
+        // print(2);
+        Storage.productsMap = await storage.getItem("products");
+        // print(Storage.productsMap);
+        Storage.products = Storage.productsMap.values.toList();
+      }
+      Navigator.of(context).pushReplacement(createRoute(BottomNavBar()));
     } else {
       Navigator.of(context).pushReplacement(createRoute(Login()));
     }
@@ -225,7 +224,7 @@ class _SplashScreenState extends State<SplashScreen> {
         var curve = Curves.fastOutSlowIn;
 
         var tween =
-        Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+            Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
         return SlideTransition(
           position: animation.drive(tween),

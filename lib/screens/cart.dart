@@ -23,6 +23,7 @@ class _CartState extends State<Cart> {
 
   @override
   Widget build(BuildContext context) {
+    // print(FirebaseAuth.instance.currentUser.uid);
     tl.length = 0;
     ml.length = 0;
     var date = DateTime.now().add(Duration(days: 2));
@@ -235,15 +236,19 @@ class _CartState extends State<Cart> {
                                 Storage.cart[i]['q'] +
                                     1,
                               });*/
-                              await FirebaseFirestore.instance
+                                        /*await FirebaseFirestore.instance
                                   .collection('users')
                                   .doc('${Storage.user['cid']}')
                                   .update({
                                 'cart.$i.q': Storage.cart[i]['q'] + 1,
-                              });
-                              setState(() {});
-                              Navigator.pop(context);
-                            },
+                              });*/
+                                        Storage.cart['$i']['q'] =
+                                            Storage.cart[i]['q'] + 1;
+                                        await Storage.writeLocal(
+                                            "cart", Storage.cart);
+                                        setState(() {});
+                                        Navigator.pop(context);
+                                      },
                             child: Container(
                               decoration: BoxDecoration(
                                   color: Colors.white,
@@ -286,14 +291,18 @@ class _CartState extends State<Cart> {
                                   Storage.cart[i]['q'] -
                                       1,
                                 });*/
-                                await FirebaseFirestore.instance
+                                          /*await FirebaseFirestore.instance
                                     .collection('users')
                                     .doc('${Storage.user['cid']}')
                                     .update({
                                   'cart.$i.q':
                                   Storage.cart[i]['q'] - 1,
-                                });
-                              } else {
+                                });*/
+                                          Storage.cart['$i']['q'] =
+                                              Storage.cart[i]['q'] - 1;
+                                          await Storage.writeLocal(
+                                              "cart", Storage.cart);
+                                        } else {
                                 products[id] = null;
                                 setState(() {});
                                 //CHANGED CART
@@ -303,13 +312,22 @@ class _CartState extends State<Cart> {
                                     .collection('cart')
                                     .doc(i)
                                     .delete();*/
-                                await FirebaseFirestore.instance
+                                          /*await FirebaseFirestore.instance
                                     .collection('users')
                                     .doc('${Storage.user['cid']}')
                                     .update({
                                   'cart.$i': FieldValue.delete()
-                                });
-                              }
+                                });*/
+                                          Storage.cart.remove('$i');
+                                          Storage.cart_products_id = [];
+                                          Storage.cart.forEach((_, element) {
+                                            Storage.cart_products_id
+                                                .add(element['id']);
+                                          });
+                                          Storage.cart_keys.remove('$i');
+                                          await Storage.writeLocal(
+                                              "cart", Storage.cart);
+                                        }
                               setState(() {});
                               Navigator.pop(context);
                             },
@@ -563,56 +581,57 @@ class _CartState extends State<Cart> {
 
   placeOrder() async {
     showLoadingDialog(context, 'Placing Order');
-    var kk = [];
-    /*await FirebaseFirestore.instance
+    try {
+      var kk = [];
+      /*await FirebaseFirestore.instance
         .collection('orders')
         .where('det.cid', isEqualTo: Storage.user['cid'])
         .where('det.stage', whereIn: ['Order Placed', 'Accepted', 'Packed'])
         .get()
         .then((value) => kk = value.docs);*/
-    if (true) {
-      // if (kk.length == 0) {
-      List<Map<String, dynamic>> cart = new List<Map<String, dynamic>>();
-      List<String> pids = new List<String>();
-      // cart = Storage.cart.values.toList();
-      pids = Storage.cart_products_id.sublist(0);
-      Storage.cart.forEach((k, element) {
-        cart.add(element);
-        // pids.add(element['id']);
-      });
+      if (true) {
+        // if (kk.length == 0) {
+        List<Map<String, dynamic>> cart = [];
+        List<dynamic> pids = [];
+        // cart = Storage.cart.values.toList();
+        pids = Storage.cart_products_id.sublist(0);
+        Storage.cart.forEach((k, element) {
+          cart.add(element);
+          // pids.add(element['id']);
+        });
 
-      String ntoken = Storage.notif_token;
+        String ntoken = Storage.notif_token;
 
-      Map<String, dynamic> order = {
-        'prods': cart,
-        'det': {
-          'cid': Storage.user['cid'],
-          'pid': Storage.APP_NAME_ + '_' + Storage.APP_LOCATION,
-          'stage': 'Order Placed',
-        },
-        'time': {'pla': Timestamp.now()},
-        'price': {
-          'tot': total,
-          'mrp': mrp,
-          'sav': (((mrp - total) / mrp) * 100).round(),
-          'del': delivery
-        },
-        'nt': ntoken,
-        'len': Storage.cart.length,
-      };
+        Map<String, dynamic> order = {
+          'prods': cart,
+          'det': {
+            'cid': Storage.user['cid'],
+            'pid': Storage.APP_NAME_ + '_' + Storage.APP_LOCATION,
+            'stage': 'Order Placed',
+          },
+          'time': {'pla': Timestamp.now()},
+          'price': {
+            'tot': total,
+            'mrp': mrp,
+            'sav': (((mrp - total) / mrp) * 100).round(),
+            'del': delivery
+          },
+          'nt': ntoken,
+          'len': Storage.cart.length,
+        };
 
-      order['id'] = generateOrderId();
+        order['id'] = generateOrderId();
 
-      await FirebaseFirestore.instance
-          .collection('orders')
-          .doc(order['id'])
-          .set(order);
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(Storage.user['cid'])
-          .update({'nt': ntoken, 'ordrd': FieldValue.arrayUnion(pids)});
-      //CHANGED CART
-      /*var l = Storage.cart;
+        await FirebaseFirestore.instance
+            .collection('orders')
+            .doc(order['id'])
+            .set(order);
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(Storage.user['cid'])
+            .update({'nt': ntoken, 'ordrd': FieldValue.arrayUnion(pids)});
+        //CHANGED CART
+        /*var l = Storage.cart;
                         l.forEach((key,e) async {
                           await FirebaseFirestore.instance
                               .collection('users')
@@ -621,18 +640,20 @@ class _CartState extends State<Cart> {
                               .doc(key)
                               .delete();
                         });*/
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(Storage.user['cid'])
-          .update({'cart': {}});
+        Storage.cart = {};
+        Storage.cart_products_id = [];
+        Storage.cart_keys = [];
+        await Storage.writeLocal("cart", Storage.cart);
 
-      Storage.shop_details['nts'].forEach((e) async {
-        await NotificationHandler.instance
-            .sendMessage('New Order', "You got a new Order.", e);
-      });
-      Navigator.pop(context);
-      Navigator.of(context).pushReplacement(createRoute(Order(order)));
-    } else {
+        Storage.shop_details['nts'].forEach((e) async {
+          await NotificationHandler.instance
+              .sendMessage('New Order', "You got a new Order.", e);
+        });
+        Navigator.pop(context);
+        Navigator.of(context)
+            .pushReplacement(createRoute(Order(orderdet: order)));
+      }
+      /*else {
       Navigator.pop(context);
       showDialog(
         context: context,
@@ -649,13 +670,31 @@ class _CartState extends State<Cart> {
           ],
         ),
       );
+    }*/
+    } catch (e) {
+      Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Can\'t place order'),
+          content:
+              Text('Something went wrong. Please try again after sometime.'),
+          actions: <Widget>[
+            FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Ok'))
+          ],
+        ),
+      );
     }
   }
 
   String generateOrderId() {
     var chars =
         'zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA9876543210zyxwvutsrqponmlkjihgfedcbaZYXWVUTSRQPONMLKJIHGFEDCBA9876543210';
-    print(chars.split('').reversed.join(''));
+    // print(chars.split('').reversed.join(''));
     var t = DateTime.now();
     String id = 'o';
     id += chars[(t.year / 100).round()];

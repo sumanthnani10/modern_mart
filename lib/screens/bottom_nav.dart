@@ -79,7 +79,7 @@ class _BottomNavBarState extends State<BottomNavBar>
         });
       });
     });*/
-    FirebaseFirestore.instance
+    /*FirebaseFirestore.instance
         .collection('users')
         .doc('${Storage.user['cid']}')
         .snapshots()
@@ -91,7 +91,7 @@ class _BottomNavBarState extends State<BottomNavBar>
       });
       Storage.cart_keys = Storage.cart.keys.toList();
       setState(() {});
-    });
+    });*/
   }
 
   @override
@@ -381,7 +381,7 @@ class _BottomNavBarState extends State<BottomNavBar>
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            Order({'order_id': message['data']['order_id']}),
+                            Order(id: message['data']['order_id']),
                       ));
                 },
                 child: Text('Check')));
@@ -405,8 +405,7 @@ class _BottomNavBarState extends State<BottomNavBar>
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    Order({'id': message['data']['order_id']}),
+                builder: (context) => Order(id: message['data']['order_id']),
               ));
         }
       }
@@ -416,8 +415,7 @@ class _BottomNavBarState extends State<BottomNavBar>
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    Order({'id': message['data']['order_id']}),
+                builder: (context) => Order(id: message['data']['order_id']),
               ));
         }
       }

@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import '../screens/cart.dart';
 import '../storage.dart';
 //import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
@@ -44,6 +45,7 @@ class TitleText extends StatelessWidget {
               padding: const EdgeInsets.only(left: 8, bottom: 0),
               child: Text(
                 title,
+                maxLines: 1,
                 style: TextStyle(
                     color: Colors.black,
                     fontSize: textSize,
