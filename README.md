@@ -1,5 +1,9 @@
 # Modern Mart
 
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![Google Maps](https://img.shields.io/badge/Google_Maps-4285F4?style=for-the-badge&logo=googlemaps&logoColor=white)
+
 A Flutter-based mobile app for local grocery and essentials delivery. Customers browse products, place orders, and receive push notifications.
 
 ## Features
